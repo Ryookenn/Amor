@@ -1,0 +1,2416 @@
+/* =========================
+   VARIABLES DE COULEURS
+========================= */
+
+:root {
+    --background: #f8f3ef;
+    --surface: #fffaf7;
+
+    --text: #291b1f;
+    --text-muted: #79676b;
+
+    --wine: #7f263e;
+    --wine-dark: #461727;
+
+    --border: #ddcfca;
+}
+
+
+/* =========================
+   RÉGLAGES GÉNÉRAUX
+========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+
+    background-color: var(--background);
+    color: var(--text);
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================
+   EN-TÊTE
+========================= */
+
+.header {
+    height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 6%;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--wine-dark);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.08em;
+
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--wine);
+    border-radius: 50%;
+
+    color: var(--wine);
+    font-size: 0.75rem;
+}
+
+
+/* =========================
+   PROGRESSION
+========================= */
+
+.progress-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.progress-bar {
+    width: 90px;
+    height: 3px;
+
+    background-color: var(--border);
+}
+
+.progress-value {
+    width: 50%;
+    height: 100%;
+
+    background-color: var(--wine);
+}
+
+
+/* =========================
+   PAGE D'ACCUEIL
+========================= */
+
+.hero {
+    min-height: calc(100vh - 76px);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 70px 8%;
+}
+
+.hero-label {
+    margin: 0 0 24px;
+
+    color: var(--wine);
+
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.hero h1 {
+    max-width: 900px;
+
+    margin: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+}
+
+.hero h1 span {
+    display: block;
+
+    color: var(--wine);
+
+    font-style: italic;
+}
+
+.hero-description {
+    max-width: 430px;
+
+    margin: 36px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+
+
+/* =========================
+   CARTE
+========================= */
+
+.map-section {
+    padding: 20px 6% 100px;
+}
+
+.map-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    margin-bottom: 24px;
+}
+
+.map-label {
+    margin: 0 0 10px;
+
+    color: var(--wine);
+
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.map-header h2 {
+    margin: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 400;
+}
+
+.map-counter {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+#map {
+    width: 100%;
+    height: 550px;
+
+    border: 1px solid var(--border);
+    border-radius: 24px;
+
+    overflow: hidden;
+}
+
+
+/* =========================
+   MARQUEURS DES DESTINATIONS
+========================= */
+
+.destination-marker {
+    background: none;
+    border: none;
+}
+
+.marker-circle {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 3px solid var(--surface);
+    border-radius: 50%;
+
+    background-color: var(--wine);
+    color: white;
+
+    box-shadow:
+        0 5px 14px rgba(70, 23, 39, 0.35);
+
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.marker-circle:hover {
+    transform: scale(1.15);
+    background-color: var(--wine-dark);
+}
+
+.marker-circle span {
+    font-size: 0.8rem;
+}
+
+
+/* =========================
+   FENÊTRE D'UNE DESTINATION
+========================= */
+
+.destination-popup {
+    min-width: 180px;
+
+    padding: 6px 4px;
+
+    color: var(--text);
+}
+
+.popup-region {
+    margin: 0 0 7px;
+
+    color: var(--wine);
+
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.destination-popup h3 {
+    margin: 0 0 12px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+}
+
+.popup-memory {
+    margin: 0;
+
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* =========================
+   VERSION MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    .header {
+        padding: 0 22px;
+    }
+
+    .progress-summary {
+        display: none;
+    }
+
+    .hero {
+        padding: 50px 22px;
+    }
+
+    .hero h1 {
+        font-size: 3.6rem;
+    }
+
+    .actions-sejours {
+        width: 100%;
+    }
+
+    .actions-sejours .ajouter-sejour {
+        flex: 1;
+    }
+
+    .supprimer-sejour {
+        flex-shrink: 0;
+    }
+}
+
+
+/* =========================
+   STATISTIQUES
+========================= */
+
+.stats-section {
+    padding: 0 6% 80px;
+}
+
+.stats-section h2 {
+    margin: 0 0 28px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 400;
+
+    color: var(--text);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    padding: 32px 20px;
+
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    text-align: center;
+}
+
+.stat-number {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 3.5rem;
+    line-height: 1;
+
+    color: var(--wine);
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    line-height: 1.5;
+
+    color: var(--text-muted);
+}
+
+@media (max-width: 600px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 24px 20px;
+    }
+
+}
+
+
+/* =========================
+   FICHE CENTRALE
+========================= */
+
+.souvenir-dialog {
+    width: min(850px, calc(100% - 32px));
+    max-height: 90vh;
+    max-height: 90dvh;
+
+    margin: auto;
+    padding: 0;
+
+    background: var(--surface);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 24px;
+
+    overflow-y: auto;
+
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+}
+
+/* L'arrière-plan assombri */
+
+.souvenir-dialog::backdrop {
+    background: rgba(25, 15, 20, 0.65);
+}
+
+/* Empêche la page de défiler derrière la fiche */
+
+body.fiche-ouverte {
+    overflow: hidden;
+}
+
+/* En-tête toujours accessible */
+
+.fiche-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+
+    padding: 24px 28px;
+
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.fiche-region {
+    margin: 0 0 8px;
+
+    color: var(--wine);
+    font-size: 0.85rem;
+}
+
+.fiche-header h2 {
+    margin: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+
+    overflow-wrap: anywhere;
+}
+
+.fermer-fiche {
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+
+    background: transparent;
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 50%;
+
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+
+.fermer-fiche:hover {
+    background: var(--background);
+}
+
+.fermer-fiche:focus-visible {
+    outline: 2px solid var(--wine);
+    outline-offset: 3px;
+}
+
+.fiche-contenu {
+    padding: 28px;
+}
+
+.fiche-contenu h3 {
+    margin: 0 0 18px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+}
+
+.fiche-contenu p,
+.fiche-contenu dd {
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+/* Conserve uniquement les retours à la ligne
+   dans les véritables réponses */
+
+.souvenir-reponse dd,
+.phrase-commune,
+.musique-souvenir p {
+    white-space: pre-wrap;
+}
+
+.fiche-dates {
+    padding: 20px;
+
+    background: var(--background);
+    border-radius: 16px;
+}
+
+.fiche-dates p {
+    margin: 8px 0 0;
+}
+
+.fiche-secondaire {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.fiche-rubrique {
+    margin-top: 32px;
+}
+
+/* Les réponses de chacun */
+
+.reponses-duo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.reponse-personne {
+    padding: 22px;
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.reponse-personne h4 {
+    margin: 0 0 24px;
+
+    color: var(--wine);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.reponse-personne dl {
+    margin: 0;
+}
+
+.reponse-personne dt {
+    margin-top: 20px;
+
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.reponse-personne dd {
+    margin: 6px 0 0;
+}
+
+.phrase-commune {
+    padding-left: 18px;
+
+    border-left: 3px solid var(--wine);
+    font-style: italic;
+}
+
+.media-vide {
+    padding: 24px;
+
+    background: var(--background);
+    color: var(--text-muted);
+
+    border-radius: 14px;
+    text-align: center;
+}
+
+/* Fiche plein écran sur téléphone */
+
+@media (max-width: 600px) {
+
+    .souvenir-dialog {
+        width: 100%;
+        max-width: 100%;
+
+        height: 100%;
+        max-height: 100dvh;
+
+        margin: 0;
+        border: none;
+        border-radius: 0;
+    }
+
+    .fiche-header {
+        padding: 20px;
+    }
+
+    .fiche-contenu {
+        padding: 20px;
+    }
+
+    .reponses-duo {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================
+   SAISIE DES SOUVENIRS
+========================= */
+
+.souvenir-champ {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    margin-bottom: 20px;
+
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.souvenir-champ input,
+.souvenir-champ textarea {
+    width: 100%;
+    min-width: 0;
+
+    padding: 12px 14px;
+
+    background: var(--surface);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    font: inherit;
+    font-size: 1rem;
+}
+
+.souvenir-champ textarea {
+    resize: vertical;
+}
+
+.souvenir-champ input:focus,
+.souvenir-champ textarea:focus {
+    outline: 2px solid var(--wine);
+    outline-offset: 2px;
+}
+
+.fiche-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    margin-top: 32px;
+}
+
+.enregistrer-souvenirs {
+    padding: 14px 20px;
+
+    background: var(--wine);
+    color: white;
+
+    border: none;
+    border-radius: 12px;
+
+    font: inherit;
+    cursor: pointer;
+}
+
+.enregistrer-souvenirs:hover {
+    background: var(--wine-dark);
+}
+
+.enregistrer-souvenirs:focus-visible {
+    outline: 2px solid var(--wine);
+    outline-offset: 3px;
+}
+
+#souvenir-message {
+    margin: 0;
+
+    color: var(--wine);
+    font-size: 0.95rem;
+}
+
+
+/* =========================
+   CONSULTATION DES SOUVENIRS
+========================= */
+
+/* Garantit que les zones masquées disparaissent réellement */
+
+[hidden] {
+    display: none !important;
+}
+
+
+/* Boutons de l'en-tête */
+
+.fiche-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modifier-fiche {
+    min-height: 44px;
+
+    padding: 0 18px;
+
+    background: var(--wine);
+    color: white;
+
+    border: 1px solid var(--wine);
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 0.9rem;
+
+    cursor: pointer;
+}
+
+.modifier-fiche:hover {
+    background: var(--wine-dark);
+    border-color: var(--wine-dark);
+}
+
+.modifier-fiche:focus-visible,
+.annuler-modification:focus-visible {
+    outline: 2px solid var(--wine);
+    outline-offset: 3px;
+}
+
+
+/* Introduction et dates */
+
+.souvenir-introduction {
+    padding: 22px 24px;
+
+    background: var(--background);
+    border-radius: 18px;
+}
+
+.souvenir-introduction .souvenir-sur-titre {
+    margin: 0 0 10px;
+
+    text-align: left;
+}
+
+.souvenir-introduction .souvenir-date {
+    margin: 0;
+}
+
+.souvenir-introduction .fiche-secondaire {
+    margin: 10px 0 0;
+}
+
+.souvenir-sur-titre {
+    margin: 0 0 7px;
+
+    color: var(--wine);
+
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.souvenir-date {
+    margin: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+
+/* Titres des rubriques */
+
+.rubrique-titre {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.rubrique-titre > div {
+    min-width: 0;
+}
+
+.rubrique-titre h3 {
+    margin: 0;
+
+    line-height: 1.2;
+}
+
+.rubrique-titre .souvenir-sur-titre {
+    margin: 0 0 5px;
+
+    text-align: left;
+}
+
+.rubrique-numero {
+    min-width: 0;
+    padding-top: 1px;
+
+    color: var(--wine);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+/* Réponses d'Amine et Maéna */
+
+.souvenir-liste {
+    margin: 0;
+}
+
+.souvenir-reponse {
+    padding: 18px 0;
+
+    border-top: 1px solid var(--border);
+}
+
+.souvenir-reponse:first-child {
+    padding-top: 0;
+    border-top: none;
+}
+
+.souvenir-reponse:last-child {
+    padding-bottom: 0;
+}
+
+.souvenir-reponse dt {
+    margin: 0 0 7px;
+
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+}
+
+.souvenir-reponse dd {
+    margin: 0;
+
+    color: var(--text);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.1rem;
+    line-height: 1.55;
+}
+
+.souvenir-reponse dd.valeur-manquante {
+    color: var(--text-muted);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.souvenir-note:not(.valeur-manquante) {
+    display: inline-flex;
+
+    padding: 7px 12px;
+
+    background: var(--wine);
+    color: white;
+
+    border-radius: 999px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.85rem;
+}
+
+
+/* Phrase commune */
+
+.phrase-commune {
+    margin: 0;
+    padding: 20px 24px;
+
+    background: var(--background);
+
+    border: none;
+    border-left: 3px solid var(--wine);
+    border-radius: 0 14px 14px 0;
+
+    color: var(--text);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.25rem;
+    font-style: italic;
+    line-height: 1.65;
+}
+
+.phrase-commune.valeur-manquante {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+
+/* Musique */
+
+.musique-souvenir {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    padding: 18px;
+
+    background: var(--background);
+    border-radius: 14px;
+}
+
+.musique-icone {
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--wine);
+    color: white;
+
+    border-radius: 50%;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.25rem;
+}
+
+.musique-souvenir p {
+    margin: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.05rem;
+}
+
+.musique-souvenir p.valeur-manquante {
+    color: var(--text-muted);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+
+/* Mode édition */
+
+.fiche-edition {
+    background: var(--background);
+}
+
+.edition-personne {
+    background: var(--surface);
+}
+
+.annuler-modification {
+    padding: 13px 19px;
+
+    background: transparent;
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    font: inherit;
+    cursor: pointer;
+}
+
+.annuler-modification:hover {
+    background: var(--surface);
+}
+
+
+/* Téléphone */
+
+@media (max-width: 600px) {
+
+    .fiche-header {
+        align-items: center;
+    }
+
+    .fiche-header-actions {
+        gap: 7px;
+    }
+
+    .modifier-fiche {
+        padding: 0 14px;
+    }
+
+    .rubrique-numero {
+        display: none;
+    }
+
+    .phrase-commune {
+        padding: 18px;
+    }
+
+}
+
+
+/* =========================
+   NAVIGATION DES SÉJOURS
+========================= */
+
+.navigation-sejours {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    padding: 14px 28px;
+
+    background: var(--background);
+    border-bottom: 1px solid var(--border);
+}
+
+.navigation-sejours-principale {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.indicateur-sejour {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+
+    min-width: 108px;
+
+    text-align: center;
+}
+
+.numero-sejour {
+    color: var(--wine);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.05rem;
+}
+
+.nombre-sejours {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+}
+
+.bouton-navigation-sejour {
+    display: grid;
+    place-items: center;
+
+    width: 34px;
+    height: 34px;
+    padding: 0;
+
+    background: var(--surface);
+    color: var(--wine);
+
+    border: 1px solid var(--border);
+    border-radius: 50%;
+
+    font: inherit;
+    font-size: 1rem;
+
+    cursor: pointer;
+}
+
+.bouton-navigation-sejour:hover:not(:disabled) {
+    background: var(--wine);
+    color: white;
+    border-color: var(--wine);
+}
+
+.ajouter-sejour {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    min-height: 38px;
+    padding: 0 15px;
+
+    background: transparent;
+    color: var(--wine);
+
+    border: 1px solid var(--wine);
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 0.85rem;
+
+    cursor: pointer;
+}
+
+.ajouter-sejour:hover:not(:disabled) {
+    background: var(--wine);
+    color: white;
+}
+
+.bouton-navigation-sejour:disabled,
+.ajouter-sejour:disabled {
+    cursor: default;
+    opacity: 0.45;
+}
+
+
+/* Adaptation sur téléphone */
+
+@media (max-width: 600px) {
+
+    .navigation-sejours {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+
+        padding: 14px 20px;
+    }
+
+    .navigation-sejours-principale {
+        justify-content: space-between;
+    }
+
+    .indicateur-sejour {
+        justify-content: center;
+    }
+
+    .ajouter-sejour {
+        justify-content: center;
+        width: 100%;
+    }
+
+}
+
+.actions-sejours {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.supprimer-sejour {
+    min-height: 38px;
+    padding: 0 15px;
+
+    background: transparent;
+    color: var(--text-muted);
+
+    border: 1px solid var(--border);
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 0.85rem;
+
+    cursor: pointer;
+}
+
+.supprimer-sejour:hover:not(:disabled) {
+    color: var(--wine);
+    border-color: var(--wine);
+}
+
+.supprimer-sejour:disabled {
+    cursor: default;
+    opacity: 0.4;
+}
+
+
+/* =========================
+   ÉCRAN DE CONNEXION
+========================= */
+
+.auth-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+
+    display: grid;
+    place-items: center;
+
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 24px;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(128, 22, 55, 0.10),
+            transparent 38%
+        ),
+        radial-gradient(
+            circle at bottom right,
+            rgba(128, 22, 55, 0.08),
+            transparent 42%
+        ),
+        var(--background);
+}
+
+.auth-screen[hidden] {
+    display: none;
+}
+
+.auth-card {
+    width: min(430px, 100%);
+    padding: 48px 42px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 26px;
+
+    text-align: center;
+
+    box-shadow:
+        0 24px 70px rgba(55, 25, 35, 0.14);
+}
+
+.auth-sur-titre {
+    margin: 0 0 10px;
+
+    color: var(--wine);
+
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+
+.auth-card h1 {
+    margin: 0;
+
+    color: var(--text);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+}
+
+.auth-introduction {
+    margin: 12px 0 34px;
+
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.auth-form {
+    display: grid;
+    gap: 18px;
+
+    text-align: left;
+}
+
+.auth-champ {
+    display: grid;
+    gap: 8px;
+
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+.auth-champ input {
+    width: 100%;
+    min-height: 50px;
+    padding: 0 15px;
+
+    background: var(--background);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 13px;
+
+    font: inherit;
+}
+
+.auth-champ input:focus {
+    outline: 2px solid var(--wine);
+    outline-offset: 2px;
+}
+
+.auth-submit {
+    min-height: 52px;
+    margin-top: 5px;
+
+    background: var(--wine);
+    color: white;
+
+    border: none;
+    border-radius: 999px;
+
+    font: inherit;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.auth-submit:hover {
+    background: var(--wine-dark);
+}
+
+.auth-submit:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.auth-message {
+    min-height: 20px;
+    margin: 0;
+
+    color: var(--wine);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.auth-signature {
+    margin: 32px 0 0;
+
+    color: var(--wine);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+}
+
+
+/* Téléphone */
+
+@media (max-width: 600px) {
+
+    .auth-screen {
+        padding: 16px;
+    }
+
+    .auth-card {
+        padding: 38px 24px;
+        border-radius: 22px;
+    }
+
+}
+
+
+/* =========================
+   ACTIONS DE L’EN-TÊTE
+========================= */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.bouton-deconnexion {
+    padding: 8px 14px;
+
+    background: transparent;
+    color: var(--text-muted);
+
+    border: 1px solid var(--border);
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 0.78rem;
+
+    cursor: pointer;
+}
+
+.bouton-deconnexion:hover {
+    color: var(--wine);
+    border-color: var(--wine);
+}
+
+.bouton-deconnexion:focus-visible {
+    outline: 2px solid var(--wine);
+    outline-offset: 3px;
+}
+
+
+/* Téléphone */
+
+@media (max-width: 600px) {
+
+    .header {
+        height: auto;
+        min-height: 76px;
+        padding: 14px 5%;
+    }
+
+    .header-actions {
+        gap: 10px;
+    }
+
+    .progress-summary {
+        display: none;
+    }
+
+    .bouton-deconnexion {
+        padding: 8px 11px;
+    }
+
+}
+
+
+/* =========================
+   PHOTOS DES SÉJOURS
+========================= */
+
+.galerie-photos,
+.apercu-photos {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.photo-souvenir {
+    position: relative;
+
+    aspect-ratio: 1 / 1;
+
+    overflow: hidden;
+
+    background: var(--background);
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.photo-souvenir img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+.ajouter-photos {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 20px;
+
+    background: var(--background);
+    color: var(--text);
+
+    border: 1px dashed var(--wine);
+    border-radius: 16px;
+
+    cursor: pointer;
+}
+
+.ajouter-photos:hover {
+    background: var(--surface);
+}
+
+.ajouter-photos-icone {
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    width: 42px;
+    height: 42px;
+
+    background: var(--wine);
+    color: white;
+
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+}
+
+.ajouter-photos strong,
+.ajouter-photos small {
+    display: block;
+}
+
+.ajouter-photos strong {
+    margin-bottom: 4px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.ajouter-photos small {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+
+.champ-fichier-cache {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    overflow: hidden;
+
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+.apercu-photos {
+    margin-top: 16px;
+}
+
+
+/* Téléphone */
+
+@media (max-width: 600px) {
+
+    .galerie-photos,
+    .apercu-photos {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+.media-vide[hidden] {
+    display: none;
+}
+
+
+/* =========================
+   VISIONNEUSE DE PHOTOS
+========================= */
+
+.photo-souvenir.photo-cliquable {
+    padding: 0;
+    border: 1px solid var(--border);
+
+    font: inherit;
+    cursor: zoom-in;
+}
+
+.photo-souvenir.photo-cliquable img {
+    transition: transform 180ms ease;
+}
+
+.photo-souvenir.photo-cliquable:hover img {
+    transform: scale(1.04);
+}
+
+.photo-souvenir.photo-cliquable:focus-visible {
+    outline: 3px solid var(--wine);
+    outline-offset: 3px;
+}
+
+.visionneuse {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+
+    width: 100vw;
+    max-width: none;
+
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+
+    margin: 0;
+    padding: 70px 24px 30px;
+
+    background: rgba(20, 12, 16, 0.96);
+
+    border: none;
+
+    overflow: hidden;
+}
+
+.visionneuse[open] {
+    display: grid;
+    grid-template-columns: 70px minmax(0, 1fr) 70px;
+    align-items: center;
+}
+
+.visionneuse::backdrop {
+    background: transparent;
+}
+
+.visionneuse-contenu {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+
+    min-width: 0;
+    margin: 0;
+}
+
+.visionneuse-contenu img {
+    display: block;
+
+    max-width: 100%;
+    max-height: calc(100dvh - 130px);
+
+    object-fit: contain;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 20px 70px rgba(0, 0, 0, 0.45);
+}
+
+.visionneuse-contenu figcaption {
+    min-height: 20px;
+
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.82rem;
+    text-align: center;
+}
+
+.fermer-visionneuse,
+.navigation-photo {
+    display: grid;
+    place-items: center;
+
+    padding: 0;
+
+    background: rgba(255, 255, 255, 0.10);
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 50%;
+
+    font: inherit;
+    cursor: pointer;
+}
+
+.fermer-visionneuse {
+    position: absolute;
+    top: 22px;
+    right: 24px;
+
+    width: 46px;
+    height: 46px;
+
+    font-size: 1.8rem;
+}
+
+.navigation-photo {
+    width: 48px;
+    height: 48px;
+
+    font-size: 1.15rem;
+}
+
+.navigation-photo-precedente {
+    justify-self: start;
+}
+
+.navigation-photo-suivante {
+    justify-self: end;
+}
+
+.navigation-photo:hover:not(:disabled),
+.fermer-visionneuse:hover {
+    background: var(--wine);
+    border-color: var(--wine);
+}
+
+.navigation-photo:disabled {
+    visibility: hidden;
+}
+
+
+/* Téléphone */
+
+@media (max-width: 600px) {
+
+    .visionneuse {
+        grid-template-columns: 46px minmax(0, 1fr) 46px;
+        padding: 70px 10px 24px;
+    }
+
+    .navigation-photo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .fermer-visionneuse {
+        top: 16px;
+        right: 16px;
+
+        width: 42px;
+        height: 42px;
+    }
+
+}
+
+
+/* =========================
+   SUPPRESSION DES PHOTOS
+========================= */
+
+.photos-existantes-edition {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.photos-edition-vides {
+    grid-column: 1 / -1;
+
+    margin: 0;
+    padding: 16px;
+
+    background: var(--background);
+    color: var(--text-muted);
+
+    border-radius: 14px;
+
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.photo-en-edition {
+    overflow: visible;
+}
+
+.photo-en-edition img {
+    border-radius: 14px;
+}
+
+.supprimer-photo {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+
+    display: grid;
+    place-items: center;
+
+    width: 30px;
+    height: 30px;
+    padding: 0;
+
+    background: var(--wine);
+    color: white;
+
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+
+    font: inherit;
+    font-size: 1.15rem;
+    line-height: 1;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 12px rgba(55, 25, 35, 0.22);
+}
+
+.supprimer-photo:hover {
+    background: var(--wine-dark);
+}
+
+.supprimer-photo:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
+
+@media (max-width: 600px) {
+
+    .photos-existantes-edition {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================
+   CAPSULE AUDIO
+========================= */
+
+.capsule-audio,
+.apercu-audio,
+.audio-existant-edition {
+    padding: 18px;
+
+    background: var(--background);
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.capsule-audio {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.capsule-audio[hidden],
+.apercu-audio[hidden] {
+    display: none;
+}
+
+.capsule-audio-icone,
+.ajouter-audio-icone {
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+
+    background: var(--wine);
+    color: white;
+
+    border-radius: 50%;
+
+    font-size: 1.15rem;
+}
+
+.capsule-audio-contenu {
+    flex: 1;
+    min-width: 0;
+}
+
+.nom-capsule-audio,
+.nom-apercu-audio {
+    margin: 0 0 10px;
+
+    color: var(--text);
+    font-size: 0.86rem;
+
+    overflow-wrap: anywhere;
+}
+
+.capsule-audio audio,
+.apercu-audio audio {
+    display: block;
+
+    width: 100%;
+    height: 40px;
+}
+
+.ajouter-audio {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 20px;
+
+    background: var(--background);
+    color: var(--text);
+
+    border: 1px dashed var(--wine);
+    border-radius: 16px;
+
+    cursor: pointer;
+}
+
+.ajouter-audio:hover {
+    background: var(--surface);
+}
+
+.ajouter-audio strong,
+.ajouter-audio small {
+    display: block;
+}
+
+.ajouter-audio strong {
+    margin-bottom: 4px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.ajouter-audio small {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+
+.apercu-audio {
+    margin-top: 16px;
+}
+
+.audio-existant-edition {
+    margin-bottom: 16px;
+}
+
+.audio-existant-edition:empty {
+    display: none;
+}
+
+
+.ajouter-audio[hidden] {
+    display: none;
+}
+
+.audio-existant-edition audio {
+    display: block;
+
+    width: 100%;
+    height: 40px;
+
+    margin-bottom: 14px;
+}
+
+.supprimer-audio {
+    padding: 9px 14px;
+
+    background: transparent;
+    color: var(--wine);
+
+    border: 1px solid var(--wine);
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 0.82rem;
+
+    cursor: pointer;
+}
+
+.supprimer-audio:hover {
+    background: var(--wine);
+    color: white;
+}
+
+.supprimer-audio:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
+
+/* =========================
+   AJOUT D’UNE VILLE
+========================= */
+
+.map-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.ouvrir-ajout-ville,
+.rechercher-ville {
+    min-height: 42px;
+    padding: 0 17px;
+
+    background: var(--wine);
+    color: white;
+
+    border: 1px solid var(--wine);
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 0.86rem;
+
+    cursor: pointer;
+}
+
+.ouvrir-ajout-ville:hover,
+.rechercher-ville:hover {
+    background: var(--wine-dark);
+    border-color: var(--wine-dark);
+}
+
+.ajout-ville-dialog {
+    width: min(650px, calc(100% - 32px));
+    max-height: 90vh;
+    max-height: 90dvh;
+
+    margin: auto;
+    padding: 0;
+
+    background: var(--surface);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 24px;
+
+    overflow-y: auto;
+
+    box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.25);
+}
+
+.ajout-ville-dialog::backdrop {
+    background: rgba(25, 15, 20, 0.65);
+}
+
+.ajout-ville-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 24px 28px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.ajout-ville-header h2 {
+    margin: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 2rem;
+    font-weight: 400;
+}
+
+.ajout-ville-form {
+    display: grid;
+    gap: 26px;
+
+    padding: 28px;
+}
+
+.recherche-ville-ligne {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+}
+
+.recherche-ville-input {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 14px;
+
+    background: var(--background);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    font: inherit;
+}
+
+.recherche-ville-input:focus {
+    outline: 2px solid var(--wine);
+    outline-offset: 2px;
+}
+
+.resultats-villes {
+    display: grid;
+    gap: 9px;
+}
+
+.ville-selectionnee {
+    padding: 20px;
+
+    background: var(--background);
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.ville-selectionnee[hidden] {
+    display: none;
+}
+
+.ville-selectionnee h3 {
+    margin: 8px 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.45rem;
+    font-weight: 400;
+}
+
+#valider-ajout-ville:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+
+@media (max-width: 700px) {
+
+    .map-header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .map-header-actions {
+        justify-content: space-between;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .map-header-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .ouvrir-ajout-ville {
+        width: 100%;
+    }
+
+    .ajout-ville-dialog {
+        width: 100%;
+        max-width: 100%;
+
+        height: 100%;
+        max-height: 100dvh;
+
+        margin: 0;
+
+        border: none;
+        border-radius: 0;
+    }
+
+    .ajout-ville-header,
+    .ajout-ville-form {
+        padding: 20px;
+    }
+
+    .recherche-ville-ligne {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================
+   RÉSULTATS DES COMMUNES
+========================= */
+
+.resultat-ville {
+    width: 100%;
+    padding: 15px 17px;
+
+    background: var(--background);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 13px;
+
+    text-align: left;
+    font: inherit;
+
+    cursor: pointer;
+}
+
+.resultat-ville:hover {
+    border-color: var(--wine);
+}
+
+.resultat-ville.selectionne {
+    background: rgba(128, 22, 55, 0.07);
+    border-color: var(--wine);
+}
+
+.resultat-ville strong,
+.resultat-ville span {
+    display: block;
+}
+
+.resultat-ville strong {
+    margin-bottom: 5px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.resultat-ville span {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.attribution-recherche {
+    margin: 6px 0 0;
+
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    text-align: right;
+}
+
+
+/* =========================
+   SUPPRESSION D’UNE VILLE
+========================= */
+
+.supprimer-ville {
+    min-height: 44px;
+    padding: 0 16px;
+
+    background: transparent;
+    color: var(--text-muted);
+
+    border: 1px solid var(--border);
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 0.82rem;
+
+    cursor: pointer;
+}
+
+.supprimer-ville:hover {
+    color: var(--wine);
+    border-color: var(--wine);
+}
+
+.supprimer-ville:disabled {
+    cursor: wait;
+    opacity: 0.5;
+}
+
+
+@media (max-width: 600px) {
+
+    .supprimer-ville {
+        width: 44px;
+        padding: 0;
+
+        overflow: hidden;
+
+        font-size: 0;
+    }
+
+    .supprimer-ville::before {
+        content: "×";
+
+        font-size: 1.25rem;
+    }
+
+}
+
+
+/* =========================
+   APERÇU AU SURVOL
+========================= */
+
+.apercu-ville-flottant {
+    position: fixed;
+    z-index: 9000;
+
+    width: min(330px, calc(100vw - 24px));
+
+    pointer-events: none;
+
+    filter:
+        drop-shadow(
+            0 18px 30px
+            rgba(40, 20, 28, 0.22)
+        );
+}
+
+.apercu-ville-flottant[hidden] {
+    display: none;
+}
+
+.apercu-ville {
+    overflow: hidden;
+
+    background: var(--surface);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+}
+
+.apercu-ville-visuel {
+    height: 135px;
+
+    background: var(--background);
+}
+
+.apercu-ville-photo {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.apercu-ville-photo-vide {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 7px;
+
+    width: 100%;
+    height: 100%;
+
+    color: var(--wine);
+}
+
+.apercu-ville-photo-vide span {
+    font-size: 1.4rem;
+}
+
+.apercu-ville-photo-vide small {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.apercu-ville-contenu {
+    padding: 16px;
+}
+
+.apercu-ville-entete {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.apercu-ville-region {
+    margin: 0 0 4px;
+
+    color: var(--wine);
+
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.apercu-ville h3 {
+    margin: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+}
+
+.apercu-ville-sejours {
+    flex-shrink: 0;
+
+    padding: 5px 9px;
+
+    background: var(--background);
+    color: var(--wine);
+
+    border-radius: 999px;
+
+    font-size: 0.7rem;
+}
+
+.apercu-ville-phrase {
+    margin: 14px 0;
+
+    color: var(--text-muted);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.9rem;
+    font-style: italic;
+    line-height: 1.45;
+}
+
+.apercu-ville-notes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+}
+
+.apercu-ville-notes > span {
+    padding: 9px 11px;
+
+    background: var(--background);
+
+    border-radius: 10px;
+}
+
+.apercu-ville-notes small,
+.apercu-ville-notes strong {
+    display: block;
+}
+
+.apercu-ville-notes small {
+    margin-bottom: 3px;
+
+    color: var(--text-muted);
+    font-size: 0.66rem;
+}
+
+.apercu-ville-notes strong {
+    color: var(--wine);
+    font-size: 0.82rem;
+}

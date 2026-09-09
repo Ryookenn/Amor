@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AMOR</title>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    >
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div
+        id="auth-screen"
+        class="auth-screen">
+
+        <section
+            class="auth-card"
+            aria-labelledby="auth-title">
+
+            <p class="auth-sur-titre">
+                Notre histoire
+            </p>
+
+            <h1 id="auth-title">
+                AMOR
+            </h1>
+
+            <p class="auth-introduction">
+                Entrez dans la carte de nos souvenirs.
+            </p>
+
+            <form id="auth-form" class="auth-form">
+
+                <label class="auth-champ">
+                    Adresse e-mail
+
+                    <input
+                        id="auth-email"
+                        type="email"
+                        autocomplete="email"
+                        required>
+                </label>
+
+                <label class="auth-champ">
+                    Mot de passe
+
+                    <input
+                        id="auth-password"
+                        type="password"
+                        autocomplete="current-password"
+                        required>
+                </label>
+
+                <button
+                    id="auth-submit"
+                    class="auth-submit"
+                    type="submit">
+                    Entrer dans AMOR
+                </button>
+
+                <p
+                    id="auth-message"
+                    class="auth-message"
+                    role="status">
+                </p>
+
+            </form>
+
+            <p class="auth-signature">
+                Amine &amp; Maéna
+            </p>
+
+        </section>
+
+    </div>
+
+    <header class="header">
+
+        <a class="logo" href="#">
+            <span class="logo-icon">♥</span>
+            <span>AMOR</span>
+        </a>
+
+        <div class="header-actions">
+
+            <div class="progress-summary">
+
+                <span id="header-city-counter">
+                    0 ville visitée
+                </span>
+
+                <div class="progress-bar">
+                    <div
+                        class="progress-value"
+                        id="header-progress-value">
+                    </div>
+                </div>
+
+            </div>
+
+            <button
+                id="deconnexion"
+                class="bouton-deconnexion"
+                type="button">
+                Se déconnecter
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <section class="hero">
+
+            <p class="hero-label">
+                Notre histoire, quelque part en France
+            </p>
+
+            <h1>
+                La France,
+                <span>Toi et moi.</span>
+            </h1>
+
+            <p class="hero-description">
+                Cinq villes, trois régions et déjà une carte
+                qui commence à raconter quelque chose.
+            </p>
+
+        </section>
+
+        <section class="map-section">
+
+            <div class="map-header">
+
+                <div>
+
+                    <p class="map-label">
+                        Nos destinations
+                    </p>
+
+                    <h2>
+                        Ça globe-trotte ou quoi là !?
+                    </h2>
+
+                </div>
+
+
+                <div class="map-header-actions">
+
+                    <p
+                        class="map-counter"
+                        id="map-counter">
+                        0 lieu débloqué
+                    </p>
+
+                    <button
+                        id="ouvrir-ajout-ville"
+                        class="ouvrir-ajout-ville"
+                        type="button">
+                        <span aria-hidden="true">＋</span>
+                        Ajouter une ville
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div id="map">
+
+            </div>
+
+        </section>
+
+        <section class="stats-section" aria-labelledby="stats-title">
+
+            <h2 id="stats-title">
+                Nos trips en chiffres
+            </h2>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-villes">—</span>
+                    <span class="stat-label">Villes visitées</span>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-departements">—</span>
+                    <span class="stat-label">Départements découverts</span>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-regions">—</span>
+                    <span class="stat-label">Régions explorées</span>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+        AJOUT D’UNE VILLE
+    ========================= -->
+
+    <dialog
+        id="ajout-ville-dialog"
+        class="ajout-ville-dialog"
+        aria-labelledby="ajout-ville-titre">
+
+        <div class="ajout-ville-header">
+
+            <div>
+
+                <p class="map-label">
+                    Nouvelle destination
+                </p>
+
+                <h2 id="ajout-ville-titre">
+                    Ajouter une ville
+                </h2>
+
+            </div>
+
+            <button
+                id="fermer-ajout-ville"
+                class="fermer-fiche"
+                type="button"
+                aria-label="Fermer">
+                ×
+            </button>
+
+        </div>
+
+
+        <form
+            id="ajout-ville-form"
+            class="ajout-ville-form">
+
+            <section>
+
+                <label
+                    class="souvenir-champ"
+                    for="recherche-ville">
+                    Nom de la ville
+                </label>
+
+                <div class="recherche-ville-ligne">
+
+                    <input
+                        id="recherche-ville"
+                        class="recherche-ville-input"
+                        type="search"
+                        placeholder="Exemple : Toulon"
+                        autocomplete="off"
+                        required>
+
+                    <button
+                        id="rechercher-ville"
+                        class="rechercher-ville"
+                        type="button">
+                        Rechercher
+                    </button>
+
+                </div>
+
+                <p class="fiche-secondaire">
+                    AMOR récupérera automatiquement la région,
+                    le département et les coordonnées.
+                </p>
+
+            </section>
+
+
+            <div
+                id="resultats-villes"
+                class="resultats-villes"
+                aria-live="polite">
+            </div>
+
+
+            <section
+                id="ville-selectionnee"
+                class="ville-selectionnee"
+                hidden>
+
+                <p class="souvenir-sur-titre">
+                    Destination sélectionnée
+                </p>
+
+                <h3 id="ville-selectionnee-nom"></h3>
+
+                <p
+                    id="ville-selectionnee-details"
+                    class="fiche-secondaire">
+                </p>
+
+            </section>
+
+
+            <section class="fiche-dates">
+
+                <h3>Notre premier séjour</h3>
+
+                <div class="reponses-duo">
+
+                    <label class="souvenir-champ">
+                        Premier jour
+
+                        <input
+                            id="nouvelle-ville-debut"
+                            type="date">
+                    </label>
+
+                    <label class="souvenir-champ">
+                        Dernier jour
+
+                        <input
+                            id="nouvelle-ville-fin"
+                            type="date">
+                    </label>
+
+                </div>
+
+            </section>
+
+
+            <div class="fiche-actions">
+
+                <button
+                    id="valider-ajout-ville"
+                    class="enregistrer-souvenirs"
+                    type="submit"
+                    disabled>
+                    Ajouter à notre carte
+                </button>
+
+                <button
+                    id="annuler-ajout-ville"
+                    class="annuler-modification"
+                    type="button">
+                    Annuler
+                </button>
+
+                <p
+                    id="ajout-ville-message"
+                    role="status">
+                </p>
+
+            </div>
+
+        </form>
+
+    </dialog>
+
+    <!-- =========================
+     FICHE CENTRALE
+        ========================= -->
+
+        <dialog
+            id="souvenir-dialog"
+            class="souvenir-dialog"
+            aria-labelledby="fiche-ville">
+
+            <!-- EN-TÊTE -->
+
+            <div class="fiche-header">
+
+                <div>
+                    <p id="fiche-region" class="fiche-region"></p>
+                    <h2 id="fiche-ville"></h2>
+                </div>
+
+                <div class="fiche-header-actions">
+
+                    <button
+                        id="supprimer-ville"
+                        class="supprimer-ville"
+                        type="button">
+                        Supprimer la ville
+                    </button>
+
+                    <button
+                        id="modifier-fiche"
+                        class="modifier-fiche"
+                        type="button">
+                        Modifier
+                    </button>
+
+                    <button
+                        id="fermer-fiche"
+                        class="fermer-fiche"
+                        type="button"
+                        aria-label="Fermer la fiche">
+                        ×
+                    </button>
+
+                </div>
+
+            </div>
+
+                        <!-- NAVIGATION ENTRE LES SÉJOURS -->
+
+            <nav
+                class="navigation-sejours"
+                aria-label="Navigation entre les séjours">
+
+                <div class="navigation-sejours-principale">
+
+                    <button
+                        id="sejour-precedent"
+                        class="bouton-navigation-sejour"
+                        type="button"
+                        aria-label="Afficher le séjour précédent"
+                        disabled>
+                        ←
+                    </button>
+
+                    <div class="indicateur-sejour">
+
+                        <span
+                            id="numero-sejour"
+                            class="numero-sejour">
+                            Séjour 1
+                        </span>
+
+                        <span
+                            id="nombre-sejours"
+                            class="nombre-sejours">
+                            sur 1
+                        </span>
+
+                    </div>
+
+                    <button
+                        id="sejour-suivant"
+                        class="bouton-navigation-sejour"
+                        type="button"
+                        aria-label="Afficher le séjour suivant"
+                        disabled>
+                        →
+                    </button>
+
+                </div>
+
+                <div class="actions-sejours">
+
+                    <button
+                        id="ajouter-sejour"
+                        class="ajouter-sejour"
+                        type="button"
+                        disabled>
+                        <span aria-hidden="true">＋</span>
+                        Nouveau séjour
+                    </button>
+
+                    <button
+                        id="supprimer-sejour"
+                        class="supprimer-sejour"
+                        type="button"
+                        disabled>
+                        Supprimer
+                    </button>
+
+                </div>
+
+            </nav>
+
+            <!-- =========================
+                MODE CONSULTATION
+            ========================= -->
+
+            <div id="souvenir-view" class="fiche-contenu">
+
+                <!-- DATES -->
+
+                <section class="souvenir-introduction">
+
+                    <p class="souvenir-sur-titre">
+                        Notre passage ici
+                    </p>
+
+                    <p
+                        id="vue-dates"
+                        class="souvenir-date">
+                    </p>
+
+                    <p
+                        id="vue-repere"
+                        class="fiche-secondaire">
+                    </p>
+
+                </section>
+
+
+                <!-- RÉPONSES INDIVIDUELLES -->
+
+                <section class="fiche-rubrique">
+
+                    <div class="rubrique-titre">
+
+                        <span class="rubrique-numero">01</span>
+
+                        <div>
+                            <p class="souvenir-sur-titre">
+                                Chacun sa version
+                            </p>
+
+                            <h3>Nos souvenirs personnels</h3>
+                        </div>
+
+                    </div>
+
+                    <div class="reponses-duo">
+
+                        <!-- AMINE -->
+
+                        <article class="reponse-personne">
+
+                            <h4>Amine</h4>
+
+                            <dl class="souvenir-liste">
+
+                                <div class="souvenir-reponse">
+                                    <dt>Lieu préféré</dt>
+                                    <dd id="vue-amine-lieu"></dd>
+                                </div>
+
+                                <div class="souvenir-reponse">
+                                    <dt>Repas préféré</dt>
+                                    <dd id="vue-amine-repas"></dd>
+                                </div>
+
+                                <div class="souvenir-reponse">
+                                    <dt>Ma phrase</dt>
+                                    <dd id="vue-amine-phrase"></dd>
+                                </div>
+
+                                <div class="souvenir-reponse">
+                                    <dt>Ma note</dt>
+                                    <dd
+                                        id="vue-amine-note"
+                                        class="souvenir-note">
+                                    </dd>
+                                </div>
+
+                            </dl>
+
+                        </article>
+
+
+                        <!-- MAÉNA -->
+
+                        <article class="reponse-personne">
+
+                            <h4>Maéna</h4>
+
+                            <dl class="souvenir-liste">
+
+                                <div class="souvenir-reponse">
+                                    <dt>Lieu préféré</dt>
+                                    <dd id="vue-maena-lieu"></dd>
+                                </div>
+
+                                <div class="souvenir-reponse">
+                                    <dt>Repas préféré</dt>
+                                    <dd id="vue-maena-repas"></dd>
+                                </div>
+
+                                <div class="souvenir-reponse">
+                                    <dt>Ma phrase</dt>
+                                    <dd id="vue-maena-phrase"></dd>
+                                </div>
+
+                                <div class="souvenir-reponse">
+                                    <dt>Ma note</dt>
+                                    <dd
+                                        id="vue-maena-note"
+                                        class="souvenir-note">
+                                    </dd>
+                                </div>
+
+                            </dl>
+
+                        </article>
+
+                    </div>
+
+                </section>
+
+
+                <!-- PHRASE COMMUNE -->
+
+                <section class="fiche-rubrique">
+
+                    <div class="rubrique-titre">
+
+                        <span class="rubrique-numero">02</span>
+
+                        <div>
+                            <p class="souvenir-sur-titre">
+                                La phrase du séjour
+                            </p>
+
+                            <h3>À retenir</h3>
+                        </div>
+
+                    </div>
+
+                    <blockquote
+                        id="vue-phrase-commune"
+                        class="phrase-commune">
+                    </blockquote>
+
+                </section>
+
+
+                <!-- MUSIQUE -->
+
+                <section class="fiche-rubrique">
+
+                    <div class="rubrique-titre">
+
+                        <span class="rubrique-numero">03</span>
+
+                        <div>
+                            <p class="souvenir-sur-titre">
+                                La bande-son
+                            </p>
+
+                            <h3>Musique associée</h3>
+                        </div>
+
+                    </div>
+
+                    <div class="musique-souvenir">
+
+                        <span class="musique-icone">♪</span>
+
+                        <p id="vue-musique"></p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- PHOTOS -->
+
+                <section class="fiche-rubrique">
+
+                    <div class="rubrique-titre">
+
+                        <span class="rubrique-numero">04</span>
+
+                        <div>
+
+                            <p class="souvenir-sur-titre">
+                                Quelques images
+                            </p>
+
+                            <h3>Nos photos</h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="galerie-photos"
+                        class="galerie-photos">
+                    </div>
+
+
+                    <div
+                        id="photos-vides"
+                        class="media-vide">
+                        Aucune photo ajoutée pour le moment.
+                    </div>
+
+                </section>
+
+
+                <!-- VOCAL -->
+
+                <section class="fiche-rubrique">
+
+                    <div class="rubrique-titre">
+
+                        <span class="rubrique-numero">05</span>
+
+                        <div>
+
+                            <p class="souvenir-sur-titre">
+                                Un instant enregistré
+                            </p>
+
+                            <h3>Notre capsule audio</h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="capsule-audio"
+                        class="capsule-audio"
+                        hidden>
+
+                        <span
+                            class="capsule-audio-icone"
+                            aria-hidden="true">
+                            ♪
+                        </span>
+
+                        <div class="capsule-audio-contenu">
+
+                            <p
+                                id="nom-capsule-audio"
+                                class="nom-capsule-audio">
+                            </p>
+
+                            <audio
+                                id="lecteur-capsule-audio"
+                                controls
+                                preload="metadata">
+                            </audio>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="audio-vide"
+                        class="media-vide">
+                        Aucun vocal ajouté pour le moment.
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- =========================
+                MODE MODIFICATION
+            ========================= -->
+
+            <form
+                id="souvenir-form"
+                class="fiche-contenu fiche-edition"
+                hidden>
+
+                <!-- DATES -->
+
+                <section class="fiche-dates">
+
+                    <h3>Les dates du séjour</h3>
+
+                    <div class="reponses-duo">
+
+                        <label class="souvenir-champ">
+                            Premier jour
+
+                            <input
+                                id="souvenir-debut"
+                                type="date">
+                        </label>
+
+                        <label class="souvenir-champ">
+                            Dernier jour
+
+                            <input
+                                id="souvenir-fin"
+                                type="date">
+                        </label>
+
+                    </div>
+
+                    <p
+                        id="fiche-repere"
+                        class="fiche-secondaire">
+                    </p>
+
+                </section>
+
+
+                <!-- AMINE ET MAÉNA -->
+
+                <section class="fiche-rubrique">
+
+                    <h3>Nos souvenirs personnels</h3>
+
+                    <div class="reponses-duo">
+
+                        <article class="reponse-personne edition-personne">
+
+                            <h4>Amine</h4>
+
+                            <label class="souvenir-champ">
+                                Lieu préféré
+                                <input id="amine-lieu" type="text">
+                            </label>
+
+                            <label class="souvenir-champ">
+                                Repas préféré
+                                <input id="amine-repas" type="text">
+                            </label>
+
+                            <label class="souvenir-champ">
+                                Ma phrase
+                                <textarea
+                                    id="amine-phrase"
+                                    rows="3">
+                                </textarea>
+                            </label>
+
+                            <label class="souvenir-champ">
+                                Ma note / 10
+
+                                <input
+                                    id="amine-note"
+                                    type="number"
+                                    min="0"
+                                    max="10"
+                                    step="0.5">
+                            </label>
+
+                        </article>
+
+
+                        <article class="reponse-personne edition-personne">
+
+                            <h4>Maéna</h4>
+
+                            <label class="souvenir-champ">
+                                Lieu préféré
+                                <input id="maena-lieu" type="text">
+                            </label>
+
+                            <label class="souvenir-champ">
+                                Repas préféré
+                                <input id="maena-repas" type="text">
+                            </label>
+
+                            <label class="souvenir-champ">
+                                Ma phrase
+                                <textarea
+                                    id="maena-phrase"
+                                    rows="3">
+                                </textarea>
+                            </label>
+
+                            <label class="souvenir-champ">
+                                Ma note / 10
+
+                                <input
+                                    id="maena-note"
+                                    type="number"
+                                    min="0"
+                                    max="10"
+                                    step="0.5">
+                            </label>
+
+                        </article>
+
+                    </div>
+
+                </section>
+
+
+                <!-- SOUVENIRS COMMUNS -->
+
+                <section class="fiche-rubrique">
+
+                    <label class="souvenir-champ">
+
+                        Notre phrase à retenir
+
+                        <textarea
+                            id="fiche-phrase-commune"
+                            rows="3">
+                        </textarea>
+
+                    </label>
+
+                </section>
+
+                <section class="fiche-rubrique">
+
+                    <label class="souvenir-champ">
+
+                        La musique associée
+
+                        <input
+                            id="fiche-musique"
+                            type="text"
+                            placeholder="Titre et artiste">
+
+                    </label>
+
+                </section>
+
+                <!-- AJOUT DES PHOTOS -->
+
+                <section class="fiche-rubrique">
+
+                    <div class="rubrique-titre">
+
+                        <span class="rubrique-numero">04</span>
+
+                        <div>
+
+                            <p class="souvenir-sur-titre">
+                                Compléter l’album
+                            </p>
+
+                            <h3>Photos du séjour</h3>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="photos-existantes-edition"
+                        class="photos-existantes-edition">
+                    </div>
+
+                    <label
+                        for="ajout-photos"
+                        class="ajouter-photos">
+
+                        <span class="ajouter-photos-icone">
+                            ＋
+                        </span>
+
+                        <span>
+
+                            <strong>
+                                Choisir des photos
+                            </strong>
+
+                            <small>
+                                JPG, PNG, WEBP ou GIF
+                            </small>
+
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        id="ajout-photos"
+                        class="champ-fichier-cache"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        multiple>
+
+
+                    <div
+                        id="apercu-photos"
+                        class="apercu-photos">
+                    </div>
+
+
+                    <p class="fiche-secondaire">
+                        Les photos seront envoyées lorsque tu enregistreras la fiche.
+                    </p>
+
+                </section>
+
+                <!-- AJOUT DU VOCAL -->
+
+                <section class="fiche-rubrique">
+
+                    <div class="rubrique-titre">
+
+                        <span class="rubrique-numero">05</span>
+
+                        <div>
+
+                            <p class="souvenir-sur-titre">
+                                Garder une voix
+                            </p>
+
+                            <h3>Capsule audio du séjour</h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="audio-existant-edition"
+                        class="audio-existant-edition">
+                    </div>
+
+
+                    <label
+                        for="ajout-audio"
+                        id="zone-ajout-audio"
+                        class="ajouter-audio">
+
+                        <span
+                            class="ajouter-audio-icone"
+                            aria-hidden="true">
+                            ♪
+                        </span>
+
+                        <span>
+
+                            <strong>
+                                Choisir ou enregistrer un vocal
+                            </strong>
+
+                            <small>
+                                Fichier audio de 20 Mo maximum
+                            </small>
+
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        id="ajout-audio"
+                        class="champ-fichier-cache"
+                        type="file"
+                        accept="audio/*">
+
+
+                    <div
+                        id="apercu-audio"
+                        class="apercu-audio"
+                        hidden>
+
+                        <p
+                            id="nom-apercu-audio"
+                            class="nom-apercu-audio">
+                        </p>
+
+                        <audio
+                            id="lecteur-apercu-audio"
+                            controls
+                            preload="metadata">
+                        </audio>
+
+                    </div>
+
+
+                    <p class="fiche-secondaire">
+                        Le vocal sera envoyé lorsque tu enregistreras la fiche.
+                    </p>
+
+                </section>
+
+                <!-- BOUTONS -->
+
+                <div class="fiche-actions">
+
+                    <button
+                        class="enregistrer-souvenirs"
+                        type="submit">
+                        Enregistrer
+                    </button>
+
+                    <button
+                        id="annuler-modification"
+                        class="annuler-modification"
+                        type="button">
+                        Annuler
+                    </button>
+
+                    <p
+                        id="souvenir-message"
+                        role="status">
+                    </p>
+
+                </div>
+
+                <p class="fiche-secondaire">
+                    Sauvegarde sur ce navigateur uniquement pour le moment.
+                </p>
+
+            </form>
+
+        </dialog>
+
+        <!-- =========================
+            VISIONNEUSE DE PHOTOS
+        ========================= -->
+
+        <dialog
+            id="visionneuse"
+            class="visionneuse"
+            aria-label="Photo agrandie">
+
+            <button
+                id="fermer-visionneuse"
+                class="fermer-visionneuse"
+                type="button"
+                aria-label="Fermer la photo">
+                ×
+            </button>
+
+
+            <button
+                id="photo-precedente"
+                class="navigation-photo navigation-photo-precedente"
+                type="button"
+                aria-label="Photo précédente">
+                ←
+            </button>
+
+
+            <figure class="visionneuse-contenu">
+
+                <img
+                    id="visionneuse-image"
+                    src=""
+                    alt="">
+
+                <figcaption
+                    id="visionneuse-legende">
+                </figcaption>
+
+            </figure>
+
+
+            <button
+                id="photo-suivante"
+                class="navigation-photo navigation-photo-suivante"
+                type="button"
+                aria-label="Photo suivante">
+                →
+            </button>
+
+        </dialog>
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="">
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+
+</body>
+
+</html>
