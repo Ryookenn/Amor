@@ -3885,8 +3885,13 @@ authForm.addEventListener(
 
         if (error) {
 
+            console.error(
+                "Erreur de connexion Supabase :",
+                error
+            );
+
             authMessage.textContent =
-                "Adresse e-mail ou mot de passe incorrect.";
+                `Connexion impossible : ${error.message}`;
 
             return;
 
