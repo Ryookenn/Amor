@@ -9,7 +9,50 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="theme-color"
+        content="#FFFAF7"
+    >
+
+    <meta
+        name="description"
+        content="AMOR, notre carte privée de voyages et de souvenirs."
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="default"
+    >
+
+    <meta
+        name="apple-mobile-web-app-title"
+        content="AMOR"
+    >
+
     <title>AMOR</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="assets/icons/amor-favicon-32.png"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="assets/icons/amor-apple-touch-icon.png"
+    >
+
+    <link
+        rel="manifest"
+        href="manifest.webmanifest"
+    >
 
     <link
         rel="stylesheet"
@@ -18,7 +61,10 @@
         crossorigin=""
     >
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
 
 <body>
@@ -91,7 +137,11 @@
     <header class="header">
 
         <a class="logo" href="#">
-            <span class="logo-icon">♥</span>
+            <img
+                class="logo-image"
+                src="assets/icons/amor-symbol.svg"
+                alt=""
+            >
             <span>AMOR</span>
         </a>
 
@@ -113,6 +163,13 @@
             </div>
 
             <button
+                id="ouvrir-compte"
+                class="bouton-compte"
+                type="button">
+                Mon compte
+            </button>
+
+            <button
                 id="deconnexion"
                 class="bouton-deconnexion"
                 type="button">
@@ -123,6 +180,82 @@
 
     </header>
 
+    <dialog
+        id="compte-dialog"
+        class="compte-dialog">
+
+        <div class="compte-contenu">
+
+            <button
+                id="fermer-compte"
+                class="compte-fermer"
+                type="button"
+                aria-label="Fermer">
+                ×
+            </button>
+
+            <p class="compte-sur-titre">
+                Espace personnel
+            </p>
+
+            <h2>Mon compte</h2>
+
+            <p class="compte-introduction">
+                Modifiez le mot de passe utilisé pour entrer dans AMOR.
+            </p>
+
+            <div class="compte-identite">
+
+                <span>Compte connecté</span>
+
+                <strong id="compte-email">
+                    Chargement…
+                </strong>
+
+            </div>
+
+            <form id="compte-form">
+
+                <label for="nouveau-mot-de-passe">
+                    Nouveau mot de passe
+                </label>
+
+                <input
+                    id="nouveau-mot-de-passe"
+                    type="password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required>
+
+                <label for="confirmation-mot-de-passe">
+                    Confirmer le nouveau mot de passe
+                </label>
+
+                <input
+                    id="confirmation-mot-de-passe"
+                    type="password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required>
+
+                <p
+                    id="compte-message"
+                    class="compte-message"
+                    aria-live="polite">
+                </p>
+
+                <button
+                    id="enregistrer-mot-de-passe"
+                    class="compte-validation"
+                    type="submit">
+                    Enregistrer le mot de passe
+                </button>
+
+            </form>
+
+        </div>
+
+    </dialog>
 
     <main>
 

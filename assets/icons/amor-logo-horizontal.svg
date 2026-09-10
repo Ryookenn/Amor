@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 310" role="img" aria-labelledby="title">
+  <title id="title">Logo AMOR</title>
+  <g transform="translate(8 0) scale(.94)">
+    <circle cx="150" cy="45" r="31" fill="#D8A092"/>
+    <g transform="translate(0 75)">
+    <path fill="#892042" d="M12 100C1 74 19 49 56 15C69 3 78 3 92 13C112 28 130 53 159 65C175 72 181 77 184 80C167 91 139 84 106 85C69 85 33 89 12 100Z"/>
+    <path fill="#D8A092" d="M156 64C180 48 198 32 215 21C230 11 240 11 253 17C276 28 296 43 299 61C302 77 294 95 290 104C276 94 256 88 234 84C216 81 201 80 184 80C185 75 175 70 156 64Z"/>
+    <path fill="#892042" d="M20 108C48 94 87 93 155 94C137 102 119 109 104 118C88 128 90 139 103 148C116 157 136 164 141 179C146 193 138 204 127 218Z"/>
+    <path fill="#892042" d="M183 91C216 88 258 92 289 106L187 209C193 188 192 174 182 162C169 146 146 141 142 130C137 117 152 105 183 91Z"/>
+    </g>
+  </g>
+  <text x="330" y="222" fill="#892042" font-family="Didot, 'Bodoni 72', 'Times New Roman', DejaVu Serif, serif" font-size="132" letter-spacing="7">AMOR</text>
+</svg>

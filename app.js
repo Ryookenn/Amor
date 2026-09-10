@@ -3911,6 +3911,176 @@ authForm.addEventListener(
 const boutonDeconnexion =
     document.querySelector("#deconnexion");
 
+// =========================
+// ESPACE MON COMPTE
+// =========================
+
+const boutonOuvrirCompte =
+    document.querySelector("#ouvrir-compte");
+
+const compteDialog =
+    document.querySelector("#compte-dialog");
+
+const boutonFermerCompte =
+    document.querySelector("#fermer-compte");
+
+const compteEmail =
+    document.querySelector("#compte-email");
+
+const compteForm =
+    document.querySelector("#compte-form");
+
+const nouveauMotDePasse =
+    document.querySelector("#nouveau-mot-de-passe");
+
+const confirmationMotDePasse =
+    document.querySelector("#confirmation-mot-de-passe");
+
+const compteMessage =
+    document.querySelector("#compte-message");
+
+const boutonEnregistrerMotDePasse =
+    document.querySelector("#enregistrer-mot-de-passe");
+
+
+boutonOuvrirCompte.addEventListener(
+    "click",
+    async function() {
+
+        compteForm.reset();
+        compteMessage.textContent = "";
+        compteMessage.classList.remove("succes");
+        compteEmail.textContent = "Chargement…";
+
+        const {
+            data,
+            error
+        } = await supabaseClient.auth.getUser();
+
+
+        if (error || !data.user) {
+
+            compteEmail.textContent =
+                "Compte indisponible";
+
+            compteMessage.textContent =
+                "Impossible de récupérer votre compte.";
+
+        } else {
+
+            compteEmail.textContent =
+                data.user.email;
+
+        }
+
+
+        compteDialog.showModal();
+
+    }
+);
+
+
+boutonFermerCompte.addEventListener(
+    "click",
+    function() {
+
+        compteDialog.close();
+
+    }
+);
+
+
+compteDialog.addEventListener(
+    "click",
+    function(event) {
+
+        if (event.target === compteDialog) {
+
+            compteDialog.close();
+
+        }
+
+    }
+);
+
+
+compteForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        compteMessage.textContent = "";
+        compteMessage.classList.remove("succes");
+
+
+        if (nouveauMotDePasse.value.length < 8) {
+
+            compteMessage.textContent =
+                "Le mot de passe doit contenir au moins 8 caractères.";
+
+            return;
+
+        }
+
+
+        if (
+            nouveauMotDePasse.value !==
+            confirmationMotDePasse.value
+        ) {
+
+            compteMessage.textContent =
+                "Les deux mots de passe ne correspondent pas.";
+
+            return;
+
+        }
+
+
+        boutonEnregistrerMotDePasse.disabled = true;
+        boutonEnregistrerMotDePasse.textContent =
+            "Enregistrement…";
+
+
+        const {
+            error
+        } = await supabaseClient.auth.updateUser({
+
+            password:
+                nouveauMotDePasse.value
+
+        });
+
+
+        boutonEnregistrerMotDePasse.disabled = false;
+        boutonEnregistrerMotDePasse.textContent =
+            "Enregistrer le mot de passe";
+
+
+        if (error) {
+
+            console.error(
+                "Modification du mot de passe impossible :",
+                error
+            );
+
+            compteMessage.textContent =
+                `Modification impossible : ${error.message}`;
+
+            return;
+
+        }
+
+
+        compteForm.reset();
+
+        compteMessage.textContent =
+            "Votre mot de passe a bien été modifié.";
+
+        compteMessage.classList.add("succes");
+
+    }
+);
 
 supabaseClient.auth.onAuthStateChange(
     function(_evenement, session) {
@@ -4693,3 +4863,40 @@ ajoutVilleDialog.addEventListener(
 
     }
 );
+
+
+// =========================
+// INSTALLATION DE LA PWA
+// =========================
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+        "load",
+        function() {
+
+            navigator.serviceWorker
+                .register(
+                    "./service-worker.js"
+                )
+                .then(function(registration) {
+
+                    console.log(
+                        "Service worker AMOR actif :",
+                        registration.scope
+                    );
+
+                })
+                .catch(function(error) {
+
+                    console.error(
+                        "Service worker AMOR non chargé :",
+                        error
+                    );
+
+                });
+
+        }
+    );
+
+}

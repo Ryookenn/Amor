@@ -83,6 +83,14 @@ body {
     font-size: 0.75rem;
 }
 
+.logo-image {
+    display: block;
+    width: 38px;
+    height: 42px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
 
 /* =========================
    PROGRESSION
@@ -2413,4 +2421,180 @@ body.fiche-ouverte {
 .apercu-ville-notes strong {
     color: var(--wine);
     font-size: 0.82rem;
+}
+
+
+/* =========================
+   ESPACE MON COMPTE
+========================= */
+
+.bouton-compte {
+    padding: 12px 20px;
+    border: 1px solid rgba(137, 32, 66, 0.35);
+    border-radius: 999px;
+    background: transparent;
+    color: #892042;
+    font: inherit;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.bouton-compte:hover {
+    background: rgba(137, 32, 66, 0.08);
+    transform: translateY(-1px);
+}
+
+.compte-dialog {
+    width: min(520px, calc(100% - 32px));
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    border: 1px solid rgba(137, 32, 66, 0.2);
+    border-radius: 30px;
+    background: #fffaf7;
+    color: #2d1c20;
+    box-shadow: 0 24px 80px rgba(45, 28, 32, 0.25);
+}
+
+.compte-dialog::backdrop {
+    background: rgba(45, 28, 32, 0.62);
+    backdrop-filter: blur(5px);
+}
+
+.compte-contenu {
+    position: relative;
+    padding: 44px;
+}
+
+.compte-fermer {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(137, 32, 66, 0.08);
+    color: #892042;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.compte-sur-titre {
+    margin: 0 0 8px;
+    color: #892042;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+
+.compte-contenu h2 {
+    margin: 0;
+    font-family: Georgia, serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+}
+
+.compte-introduction {
+    margin: 12px 0 28px;
+    color: #80666d;
+    line-height: 1.6;
+}
+
+.compte-identite {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 28px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    background: rgba(137, 32, 66, 0.06);
+}
+
+.compte-identite span {
+    color: #80666d;
+    font-size: 0.82rem;
+}
+
+.compte-identite strong {
+    color: #892042;
+    overflow-wrap: anywhere;
+}
+
+#compte-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#compte-form label {
+    margin: 0 0 8px;
+    color: #694f56;
+}
+
+#compte-form input {
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 15px 17px;
+    border: 1px solid #dbc9c5;
+    border-radius: 15px;
+    background: #ffffff;
+    color: #2d1c20;
+    font: inherit;
+}
+
+#compte-form input:focus {
+    border-color: #892042;
+    outline: 3px solid rgba(137, 32, 66, 0.1);
+}
+
+.compte-message {
+    min-height: 24px;
+    margin: 0 0 14px;
+    color: #892042;
+    text-align: center;
+}
+
+.compte-message.succes {
+    color: #47755a;
+}
+
+.compte-validation {
+    padding: 15px 22px;
+    border: 0;
+    border-radius: 999px;
+    background: #892042;
+    color: white;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.compte-validation:hover {
+    background: #711936;
+}
+
+.compte-validation:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+@media (max-width: 700px) {
+    .header-actions {
+        gap: 10px;
+    }
+
+    .bouton-compte,
+    .bouton-deconnexion {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+    }
+
+    .compte-contenu {
+        padding: 40px 24px 28px;
+    }
 }
