@@ -3810,6 +3810,75 @@ const authSubmit =
 const authMessage =
     document.querySelector("#auth-message");
 
+// =========================
+// RÉCUPÉRATION DU MOT DE PASSE
+// =========================
+
+const boutonOuvrirRecuperation =
+    document.querySelector(
+        "#ouvrir-recuperation"
+    );
+
+const recuperationDialog =
+    document.querySelector(
+        "#recuperation-dialog"
+    );
+
+const boutonFermerRecuperation =
+    document.querySelector(
+        "#fermer-recuperation"
+    );
+
+const recuperationForm =
+    document.querySelector(
+        "#recuperation-form"
+    );
+
+const recuperationEmail =
+    document.querySelector(
+        "#recuperation-email"
+    );
+
+const recuperationMessage =
+    document.querySelector(
+        "#recuperation-message"
+    );
+
+const boutonEnvoyerRecuperation =
+    document.querySelector(
+        "#envoyer-recuperation"
+    );
+
+
+const nouveauPasswordDialog =
+    document.querySelector(
+        "#nouveau-password-dialog"
+    );
+
+const nouveauPasswordForm =
+    document.querySelector(
+        "#nouveau-password-form"
+    );
+
+const passwordRecupere =
+    document.querySelector(
+        "#password-recupere"
+    );
+
+const confirmationPasswordRecupere =
+    document.querySelector(
+        "#confirmation-password-recupere"
+    );
+
+const nouveauPasswordMessage =
+    document.querySelector(
+        "#nouveau-password-message"
+    );
+
+const boutonEnregistrerPasswordRecupere =
+    document.querySelector(
+        "#enregistrer-password-recupere"
+    );
 
 function afficherEcranConnexion() {
 
@@ -3903,6 +3972,235 @@ authForm.addEventListener(
     }
 );
 
+boutonOuvrirRecuperation.addEventListener(
+    "click",
+    function() {
+
+        recuperationForm.reset();
+
+        recuperationMessage.textContent = "";
+        recuperationMessage.classList.remove(
+            "succes"
+        );
+
+
+        recuperationEmail.value =
+            authEmail.value.trim();
+
+
+        recuperationDialog.showModal();
+
+
+        window.setTimeout(
+            function() {
+
+                recuperationEmail.focus();
+
+            },
+            100
+        );
+
+    }
+);
+
+
+boutonFermerRecuperation.addEventListener(
+    "click",
+    function() {
+
+        recuperationDialog.close();
+
+    }
+);
+
+
+recuperationDialog.addEventListener(
+    "click",
+    function(event) {
+
+        if (event.target === recuperationDialog) {
+
+            recuperationDialog.close();
+
+        }
+
+    }
+);
+
+
+recuperationForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        recuperationMessage.textContent =
+            "Envoi du lien en cours…";
+
+        recuperationMessage.classList.remove(
+            "succes"
+        );
+
+
+        boutonEnvoyerRecuperation.disabled =
+            true;
+
+        boutonEnvoyerRecuperation.textContent =
+            "Envoi en cours…";
+
+
+        const urlRetour =
+            `${window.location.origin}${window.location.pathname}`;
+
+
+        const {
+            error
+        } = await supabaseClient.auth
+            .resetPasswordForEmail(
+                recuperationEmail.value.trim(),
+                {
+                    redirectTo:
+                        urlRetour
+                }
+            );
+
+
+        boutonEnvoyerRecuperation.disabled =
+            false;
+
+        boutonEnvoyerRecuperation.textContent =
+            "Envoyer le lien";
+
+
+        if (error) {
+
+            console.error(
+                "Erreur de récupération :",
+                error
+            );
+
+            recuperationMessage.textContent =
+                `Envoi impossible : ${error.message}`;
+
+            return;
+
+        }
+
+
+        recuperationMessage.textContent =
+            "Si cette adresse correspond à un compte AMOR, un lien vient d’être envoyé. Vérifiez également les courriers indésirables.";
+
+        recuperationMessage.classList.add(
+            "succes"
+        );
+
+    }
+);
+
+
+nouveauPasswordForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        nouveauPasswordMessage.textContent = "";
+        nouveauPasswordMessage.classList.remove(
+            "succes"
+        );
+
+
+        if (passwordRecupere.value.length < 8) {
+
+            nouveauPasswordMessage.textContent =
+                "Le mot de passe doit contenir au moins 8 caractères.";
+
+            return;
+
+        }
+
+
+        if (
+            passwordRecupere.value !==
+            confirmationPasswordRecupere.value
+        ) {
+
+            nouveauPasswordMessage.textContent =
+                "Les deux mots de passe ne correspondent pas.";
+
+            return;
+
+        }
+
+
+        boutonEnregistrerPasswordRecupere.disabled =
+            true;
+
+        boutonEnregistrerPasswordRecupere.textContent =
+            "Enregistrement…";
+
+
+        const {
+            error
+        } = await supabaseClient.auth.updateUser({
+
+            password:
+                passwordRecupere.value
+
+        });
+
+
+        if (error) {
+
+            boutonEnregistrerPasswordRecupere.disabled =
+                false;
+
+            boutonEnregistrerPasswordRecupere.textContent =
+                "Enregistrer le mot de passe";
+
+            console.error(
+                "Nouveau mot de passe impossible :",
+                error
+            );
+
+            nouveauPasswordMessage.textContent =
+                `Modification impossible : ${error.message}`;
+
+            return;
+
+        }
+
+
+        nouveauPasswordMessage.textContent =
+            "Le mot de passe a bien été modifié.";
+
+        nouveauPasswordMessage.classList.add(
+            "succes"
+        );
+
+
+        await supabaseClient.auth.signOut();
+
+
+        nouveauPasswordForm.reset();
+        nouveauPasswordDialog.close();
+
+
+        window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+        );
+
+
+        afficherEcranConnexion();
+
+        authMessage.textContent =
+            "Votre mot de passe a été modifié. Vous pouvez maintenant vous connecter.";
+
+    }
+);
 
 // =========================
 // SUIVI DE LA SESSION
@@ -4083,7 +4381,48 @@ compteForm.addEventListener(
 );
 
 supabaseClient.auth.onAuthStateChange(
-    function(_evenement, session) {
+    function(evenement, session) {
+
+        if (
+            evenement ===
+            "PASSWORD_RECOVERY"
+        ) {
+
+            masquerEcranConnexion();
+
+            nouveauPasswordForm.reset();
+
+            nouveauPasswordMessage.textContent =
+                "";
+
+            nouveauPasswordMessage.classList.remove(
+                "succes"
+            );
+
+
+            if (
+                !nouveauPasswordDialog.open
+            ) {
+
+                nouveauPasswordDialog.showModal();
+
+            }
+
+
+            window.setTimeout(
+                function() {
+
+                    passwordRecupere.focus();
+
+                },
+                100
+            );
+
+
+            return;
+
+        }
+
 
         if (session) {
 

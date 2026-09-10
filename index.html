@@ -112,6 +112,13 @@
                 </label>
 
                 <button
+                    id="ouvrir-recuperation"
+                    class="auth-lien"
+                    type="button">
+                    Mot de passe oublié ?
+                </button>               
+
+                <button
                     id="auth-submit"
                     class="auth-submit"
                     type="submit">
@@ -133,6 +140,132 @@
         </section>
 
     </div>
+
+    <!-- =========================
+        DEMANDE DE RÉCUPÉRATION
+    ========================= -->
+
+    <dialog
+        id="recuperation-dialog"
+        class="auth-dialog">
+
+        <div class="auth-dialog-contenu">
+
+            <button
+                id="fermer-recuperation"
+                class="auth-dialog-fermer"
+                type="button"
+                aria-label="Fermer">
+                ×
+            </button>
+
+            <p class="auth-sur-titre">
+                Accès à AMOR
+            </p>
+
+            <h2>Mot de passe oublié</h2>
+
+            <p class="auth-dialog-introduction">
+                Indiquez l’adresse e-mail utilisée pour accéder à AMOR.
+                Un lien sécurisé vous permettra de choisir un nouveau
+                mot de passe.
+            </p>
+
+            <form id="recuperation-form">
+
+                <label for="recuperation-email">
+                    Adresse e-mail
+                </label>
+
+                <input
+                    id="recuperation-email"
+                    type="email"
+                    autocomplete="email"
+                    required>
+
+                <p
+                    id="recuperation-message"
+                    class="auth-dialog-message"
+                    aria-live="polite">
+                </p>
+
+                <button
+                    id="envoyer-recuperation"
+                    class="auth-dialog-validation"
+                    type="submit">
+                    Envoyer le lien
+                </button>
+
+            </form>
+
+        </div>
+
+    </dialog>
+
+
+    <!-- =========================
+        NOUVEAU MOT DE PASSE
+    ========================= -->
+
+    <dialog
+        id="nouveau-password-dialog"
+        class="auth-dialog">
+
+        <div class="auth-dialog-contenu">
+
+            <p class="auth-sur-titre">
+                Accès sécurisé
+            </p>
+
+            <h2>Nouveau mot de passe</h2>
+
+            <p class="auth-dialog-introduction">
+                Choisissez le nouveau mot de passe qui sera utilisé
+                pour entrer dans AMOR.
+            </p>
+
+            <form id="nouveau-password-form">
+
+                <label for="password-recupere">
+                    Nouveau mot de passe
+                </label>
+
+                <input
+                    id="password-recupere"
+                    type="password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required>
+
+                <label for="confirmation-password-recupere">
+                    Confirmer le nouveau mot de passe
+                </label>
+
+                <input
+                    id="confirmation-password-recupere"
+                    type="password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required>
+
+                <p
+                    id="nouveau-password-message"
+                    class="auth-dialog-message"
+                    aria-live="polite">
+                </p>
+
+                <button
+                    id="enregistrer-password-recupere"
+                    class="auth-dialog-validation"
+                    type="submit">
+                    Enregistrer le mot de passe
+                </button>
+
+            </form>
+
+        </div>
+
+    </dialog>
 
     <header class="header">
 
