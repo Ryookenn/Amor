@@ -1037,6 +1037,10 @@ body.fiche-ouverte {
         display: none;
     }
 
+    .rubrique-titre {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
     .phrase-commune {
         padding: 18px;
     }
@@ -2894,6 +2898,9 @@ body.fiche-ouverte {
     background: var(--background);
     color: var(--text);
 
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
     box-shadow:
         0 28px 90px
         rgba(45, 28, 32, 0.3);
@@ -3638,6 +3645,358 @@ body.fiche-ouverte {
 
     .premiere-fois-date {
         grid-column: 2;
+    }
+
+}
+
+
+/* =========================
+   OPTIMISATION MOBILE GLOBALE
+========================= */
+
+button,
+a,
+input,
+select,
+textarea {
+    touch-action: manipulation;
+}
+
+@media (max-width: 600px) {
+
+    body {
+        overflow-x: hidden;
+    }
+
+    .header {
+        min-height: 72px;
+        gap: 10px;
+        padding:
+            max(10px, env(safe-area-inset-top))
+            16px
+            10px;
+    }
+
+    .logo {
+        min-width: 0;
+        gap: 7px;
+        font-size: 1.05rem;
+    }
+
+    .logo-image {
+        width: 33px;
+        height: 36px;
+    }
+
+    .header-actions {
+        min-width: 0;
+        gap: 7px;
+    }
+
+    .bouton-compte,
+    .bouton-deconnexion {
+        min-height: 44px;
+        padding: 8px 12px;
+        font-size: 0.78rem;
+        line-height: 1.15;
+    }
+
+    .hero {
+        min-height: auto;
+        justify-content: flex-start;
+        padding: 64px 22px 72px;
+    }
+
+    .hero-label {
+        margin-bottom: 18px;
+        line-height: 1.5;
+    }
+
+    .hero h1 {
+        font-size: clamp(3.15rem, 15vw, 4.5rem);
+        line-height: 0.98;
+    }
+
+    .hero-description {
+        margin-top: 28px;
+        font-size: 1rem;
+        line-height: 1.65;
+    }
+
+    .premieres-fois-resume {
+        width: auto;
+        margin: 0 20px 56px;
+        padding: 20px;
+        grid-template-columns: 46px minmax(0, 1fr);
+        gap: 14px;
+        border-radius: 20px;
+    }
+
+    .premieres-fois-resume-icone {
+        width: 46px;
+        height: 46px;
+        font-size: 1.2rem;
+    }
+
+    .premieres-fois-resume-texte h2 {
+        font-size: 1.45rem;
+    }
+
+    .premieres-fois-resume-texte > p:last-child {
+        font-size: 0.86rem;
+    }
+
+    .premieres-fois-resume-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        grid-column: 1 / -1;
+        text-align: left;
+    }
+
+    .premieres-fois-resume-actions p {
+        margin: 0;
+    }
+
+    .ouvrir-premieres-fois,
+    .afficher-formulaire-premiere-fois,
+    .enregistrer-premiere-fois,
+    .annuler-premiere-fois {
+        min-height: 44px;
+    }
+
+    .map-section,
+    .stats-section {
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    .map-section {
+        padding-bottom: 70px;
+    }
+
+    .map-header h2 {
+        font-size: clamp(2.25rem, 12vw, 3.25rem);
+        line-height: 1.02;
+    }
+
+    .map-header-actions {
+        gap: 12px;
+    }
+
+    .ouvrir-ajout-ville {
+        min-height: 50px;
+    }
+
+    #map {
+        height: min(62dvh, 540px);
+        min-height: 430px;
+        border-radius: 20px;
+    }
+
+    .stats-section {
+        padding-bottom: 60px;
+    }
+
+    .souvenir-dialog,
+    .ajout-ville-dialog,
+    .premieres-fois-dialog {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        max-height: 100dvh;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+    }
+
+    .fiche-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        padding:
+            max(18px, env(safe-area-inset-top))
+            20px
+            18px;
+    }
+
+    .fiche-header > div:first-child {
+        min-width: 0;
+    }
+
+    .fiche-header h2 {
+        font-size: clamp(1.75rem, 9vw, 2.35rem);
+    }
+
+    .fiche-header-actions {
+        align-self: center;
+    }
+
+    .modifier-fiche,
+    .fermer-fiche,
+    .supprimer-ville {
+        min-height: 44px;
+    }
+
+    .modifier-fiche {
+        padding: 0 13px;
+        font-size: 0.82rem;
+    }
+
+    .navigation-sejours {
+        padding: 14px 20px;
+    }
+
+    .fiche-contenu {
+        padding: 20px;
+    }
+
+    .fiche-rubrique {
+        margin-top: 38px;
+    }
+
+    .rubrique-titre {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+    }
+
+    .rubrique-titre > div,
+    .rubrique-titre h3,
+    .rubrique-titre .souvenir-sur-titre {
+        width: 100%;
+        overflow-wrap: normal;
+        word-break: normal;
+    }
+
+    .rubrique-titre h3 {
+        font-size: 1.45rem;
+    }
+
+    .reponse-personne {
+        padding: 20px;
+    }
+
+    .souvenir-champ input,
+    .souvenir-champ textarea,
+    .premiere-fois-champ input,
+    .premiere-fois-champ select,
+    .premiere-fois-champ textarea,
+    .recherche-ville-input,
+    #compte-form input,
+    #recuperation-form input,
+    #nouveau-password-form input {
+        font-size: 16px;
+    }
+
+    .premieres-fois-header {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        padding:
+            max(24px, env(safe-area-inset-top))
+            68px
+            22px
+            20px;
+    }
+
+    .premieres-fois-header h2 {
+        font-size: clamp(2rem, 11vw, 2.75rem);
+    }
+
+    .fermer-premieres-fois {
+        top: max(16px, env(safe-area-inset-top));
+        right: 16px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .premieres-fois-statistiques {
+        padding: 18px 20px 0;
+    }
+
+    .premieres-fois-statistiques > div {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 12px;
+    }
+
+    .premiere-fois-ajout {
+        margin: 18px 20px;
+        padding: 18px;
+    }
+
+    .premieres-fois-colonnes {
+        padding: 0 20px calc(28px + env(safe-area-inset-bottom));
+    }
+
+    .premiere-fois-carte {
+        grid-template-columns: 39px minmax(0, 1fr);
+    }
+
+    .premiere-fois-carte-actions {
+        grid-column: 2;
+        align-items: flex-start;
+        flex-direction: row;
+    }
+
+    .galerie-photos,
+    .apercu-photos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .visionneuse[open] {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        padding:
+            calc(70px + env(safe-area-inset-top))
+            14px
+            calc(24px + env(safe-area-inset-bottom));
+    }
+
+    .visionneuse-contenu img {
+        max-height: calc(100dvh - 150px);
+    }
+
+    .navigation-photo {
+        position: absolute;
+        top: 50%;
+        z-index: 2;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+    }
+
+    .navigation-photo-precedente {
+        left: 12px;
+    }
+
+    .navigation-photo-suivante {
+        right: 12px;
+    }
+
+    .fermer-visionneuse {
+        top: max(16px, env(safe-area-inset-top));
+        right: 16px;
+    }
+
+}
+
+@media (max-width: 380px) {
+
+    .logo span:last-child {
+        display: none;
+    }
+
+    .bouton-compte,
+    .bouton-deconnexion {
+        padding-inline: 10px;
+        font-size: 0.74rem;
+    }
+
+    .premieres-fois-resume-actions {
+        align-items: stretch;
+        flex-direction: column;
     }
 
 }

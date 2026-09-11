@@ -6,7 +6,7 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
 
     <meta
@@ -63,7 +63,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css"
+        href="style.css?v=mobile-1"
     >
 </head>
 
@@ -445,6 +445,7 @@
                 <button
                     id="ouvrir-premieres-fois"
                     class="ouvrir-premieres-fois"
+                    aria-haspopup="dialog"
                     type="button">
                     Découvrir notre liste
                 </button>
@@ -642,7 +643,7 @@
                         id="premiere-fois-categorie"
                         required>
 
-                        <option value="aventure">
+                        <option value="amor" selected>
                             Amor
                         </option>
 
@@ -1826,7 +1827,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=mobile-1"></script>
 
 </body>
 

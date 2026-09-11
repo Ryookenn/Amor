@@ -5781,7 +5781,7 @@ function fermerFormulairePremiereFois() {
         "";
 
     premiereFoisCategorie.value =
-        "Amor";
+        "amor";
 
     premiereFoisMessage.textContent =
         "";
