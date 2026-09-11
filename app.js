@@ -1585,6 +1585,10 @@ function afficherSouvenirs(souvenirs) {
         souvenirs.musique
     );
 
+    afficherBadgesPremieresFois(
+        souvenirs.id
+    );
+
 }
 
 
@@ -3008,8 +3012,14 @@ function afficherModeEdition() {
     formulaireModifie = false;
 
     remplirFormulaire(souvenirsActifs);
+
+    afficherSelectionPremieresFois(
+        souvenirsActifs.id ?? null
+    );
+
     viderSelectionPhotos();
     afficherPhotosEdition();
+
     viderSelectionAudio();
     afficherAudioEdition();
 
@@ -3076,6 +3086,18 @@ async function ouvrirFiche(destination) {
 
     }
 
+    try {
+
+        await chargerPremieresFois();
+
+    } catch (erreur) {
+
+        console.error(
+            "Actualisation des premières fois impossible :",
+            erreur
+        );
+
+    }
 
     afficherSouvenirs(
         souvenirsActifs
@@ -3338,6 +3360,47 @@ souvenirForm.addEventListener(
             return;
         }
 
+        const premieresFoisADebloquer =
+            obtenirPremieresFoisSelectionnees();
+
+
+        if (
+            premieresFoisADebloquer.length > 0
+        ) {
+
+            const noms =
+                premieresFoisADebloquer
+                    .map(
+                        function(premiereFois) {
+
+                            return (
+                                `• ${premiereFois.title}`
+                            );
+
+                        }
+                    )
+                    .join("\n");
+
+
+            const confirmation =
+                window.confirm(
+                    `Débloquer ${
+                        premieresFoisADebloquer.length
+                    } première${
+                        premieresFoisADebloquer.length > 1
+                            ? "s"
+                            : ""
+                    } fois à ${
+                        destinationActive.ville
+                    } ?\n\n${noms}\n\nCes badges seront associés à ce séjour.`
+                );
+
+
+            if (!confirmation) {
+                return;
+            }
+
+        }
 
         const nouveauxSouvenirs = {
 
@@ -3411,6 +3474,20 @@ souvenirForm.addEventListener(
                 sejourEnregistre;
 
             creationSejour = false;
+
+            if (
+                premieresFoisADebloquer.length > 0
+            ) {
+
+                souvenirMessage.textContent =
+                    "Déblocage des premières fois…";
+
+                await debloquerPremieresFois(
+                    sejourEnregistre.id,
+                    premieresFoisADebloquer
+                );
+
+            }
 
             if (
                 fichiersPhotosSelectionnes.length > 0
@@ -3610,9 +3687,19 @@ boutonSupprimerSejour.addEventListener(
                 erreur
             );
 
-            window.alert(
-                "La suppression n’a pas pu être enregistrée."
-            );
+            if (erreur.code === "23503") {
+
+                window.alert(
+                    "Ce séjour contient au moins un badge « Première fois ». Corrige d’abord son attribution depuis « Nos premières fois », puis réessaie."
+                );
+
+            } else {
+
+                window.alert(
+                    "Le séjour n’a pas pu être supprimé."
+                );
+
+            }
 
         }
 
@@ -4430,9 +4517,23 @@ supabaseClient.auth.onAuthStateChange(
 
             chargerDestinationsDepuisSupabase();
 
+            chargerPremieresFois()
+                .catch(function(erreur) {
+
+                    console.error(
+                        "Initialisation des premières fois impossible :",
+                        erreur
+                    );
+
+                });
+
         } else {
 
             destinations = [];
+
+            premieresFois = [];
+
+            afficherPremieresFois();
 
             marqueursDestinations.clearLayers();
 
@@ -4483,6 +4584,1664 @@ boutonDeconnexion.addEventListener(
     }
 );
 
+
+// =========================
+// NOS PREMIÈRES FOIS
+// =========================
+
+let premieresFois = [];
+
+
+const categoriesPremieresFois = {
+
+    amor: {
+        nom: "Amor",
+        icone: "♥"
+    },
+
+    aventure: {
+        nom: "Aventure",
+        icone: "✦"
+    },
+
+    voyage: {
+        nom: "Voyage",
+        icone: "⌖"
+    },
+
+    gastronomie: {
+        nom: "Gastronomie",
+        icone: "◇"
+    },
+
+    culture: {
+        nom: "Culture",
+        icone: "◉"
+    },
+
+    nature: {
+        nom: "Nature",
+        icone: "❧"
+    },
+
+    quotidien: {
+        nom: "Quotidien",
+        icone: "○"
+    },
+
+    evenement: {
+        nom: "Événement",
+        icone: "☆"
+    },
+
+    autre: {
+        nom: "Autre",
+        icone: "•"
+    }
+
+};
+
+
+const premieresFoisDialog =
+    document.querySelector(
+        "#premieres-fois-dialog"
+    );
+
+const boutonOuvrirPremieresFois =
+    document.querySelector(
+        "#ouvrir-premieres-fois"
+    );
+
+const boutonFermerPremieresFois =
+    document.querySelector(
+        "#fermer-premieres-fois"
+    );
+
+const premieresFoisCompteur =
+    document.querySelector(
+        "#premieres-fois-compteur"
+    );
+
+const nombrePremieresFoisAVivre =
+    document.querySelector(
+        "#nombre-premieres-fois-a-vivre"
+    );
+
+const nombrePremieresFoisRealisees =
+    document.querySelector(
+        "#nombre-premieres-fois-realisees"
+    );
+
+const listePremieresFoisAVivre =
+    document.querySelector(
+        "#liste-premieres-fois-a-vivre"
+    );
+
+const listePremieresFoisRealisees =
+    document.querySelector(
+        "#liste-premieres-fois-realisees"
+    );
+
+const boutonAfficherFormulairePremiereFois =
+    document.querySelector(
+        "#afficher-formulaire-premiere-fois"
+    );
+
+const premiereFoisForm =
+    document.querySelector(
+        "#premiere-fois-form"
+    );
+
+const premiereFoisId =
+    document.querySelector(
+        "#premiere-fois-id"
+    );
+
+const premiereFoisTitreInput =
+    document.querySelector(
+        "#premiere-fois-titre-input"
+    );
+
+const premiereFoisCategorie =
+    document.querySelector(
+        "#premiere-fois-categorie"
+    );
+
+const premiereFoisDescription =
+    document.querySelector(
+        "#premiere-fois-description"
+    );
+
+const premiereFoisMessage =
+    document.querySelector(
+        "#premiere-fois-message"
+    );
+
+const boutonEnregistrerPremiereFois =
+    document.querySelector(
+        "#enregistrer-premiere-fois"
+    );
+
+const boutonAnnulerPremiereFois =
+    document.querySelector(
+        "#annuler-premiere-fois"
+    );
+
+const vuePremieresFoisSection =
+    document.querySelector(
+        "#vue-premieres-fois-section"
+    );
+
+const vuePremieresFois =
+    document.querySelector(
+        "#vue-premieres-fois"
+    );
+
+const premieresFoisDejaAttribuees =
+    document.querySelector(
+        "#premieres-fois-deja-attribuees"
+    );
+
+const premieresFoisSelection =
+    document.querySelector(
+        "#premieres-fois-selection"
+    );
+
+const premieresFoisSelectionVide =
+    document.querySelector(
+        "#premieres-fois-selection-vide"
+    );
+
+// =========================
+// CHARGEMENT
+// =========================
+
+async function chargerPremieresFois() {
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("first_times")
+        .select(`
+            id,
+            title,
+            description,
+            category,
+            sort_order,
+            stay_id,
+            unlocked_on,
+            unlocked_at,
+            created_at,
+            stay:stays (
+                id,
+                date_start,
+                date_end,
+                city:cities (
+                    id,
+                    name,
+                    region
+                )
+            )
+        `)
+        .order(
+            "sort_order",
+            {
+                ascending: true
+            }
+        )
+        .order(
+            "created_at",
+            {
+                ascending: true
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Chargement des premières fois impossible :",
+            error
+        );
+
+        throw error;
+
+    }
+
+
+    premieresFois =
+        data ?? [];
+
+
+    afficherPremieresFois();
+
+}
+
+
+// =========================
+// AFFICHAGE
+// =========================
+
+function obtenirCategoriePremiereFois(
+    categorie
+) {
+
+    return (
+        categoriesPremieresFois[categorie] ??
+        categoriesPremieresFois.autre
+    );
+
+}
+
+
+function creerTexteVide(texte) {
+
+    const element =
+        document.createElement("p");
+
+    element.className =
+        "premieres-fois-vide";
+
+    element.textContent =
+        texte;
+
+    return element;
+
+}
+
+
+function creerCartePremiereFois(
+    premiereFois
+) {
+
+    const realisee =
+        premiereFois.stay_id !== null;
+
+    const categorie =
+        obtenirCategoriePremiereFois(
+            premiereFois.category
+        );
+
+
+    const carte =
+        document.createElement("article");
+
+    carte.className =
+        realisee
+            ? "premiere-fois-carte debloquee"
+            : "premiere-fois-carte";
+
+
+    const icone =
+        document.createElement("span");
+
+    icone.className =
+        "premiere-fois-carte-icone";
+
+    icone.textContent =
+        categorie.icone;
+
+
+    const contenu =
+        document.createElement("div");
+
+    contenu.className =
+        "premiere-fois-carte-contenu";
+
+
+    const categorieElement =
+        document.createElement("p");
+
+    categorieElement.className =
+        "premiere-fois-carte-categorie";
+
+    categorieElement.textContent =
+        realisee
+            ? `Badge débloqué · ${categorie.nom}`
+            : categorie.nom;
+
+
+    const titre =
+        document.createElement("h4");
+
+    titre.textContent =
+        premiereFois.title;
+
+
+    contenu.appendChild(
+        categorieElement
+    );
+
+    contenu.appendChild(
+        titre
+    );
+
+
+    if (premiereFois.description) {
+
+        const description =
+            document.createElement("p");
+
+        description.className =
+            "premiere-fois-carte-description";
+
+        description.textContent =
+            premiereFois.description;
+
+        contenu.appendChild(
+            description
+        );
+
+    }
+
+
+    if (realisee) {
+
+        const details =
+            document.createElement("p");
+
+        details.className =
+            "premiere-fois-carte-lieu";
+
+
+        const ville =
+            premiereFois.stay?.city?.name ??
+            "Souvenir associé";
+
+
+        if (premiereFois.unlocked_on) {
+
+            details.textContent =
+                `${ville} · ${formaterDate(
+                    premiereFois.unlocked_on
+                )}`;
+
+        } else {
+
+            details.textContent =
+                ville;
+
+        }
+
+
+        contenu.appendChild(
+            details
+        );
+
+    }
+
+
+    carte.appendChild(
+        icone
+    );
+
+    carte.appendChild(
+        contenu
+    );
+
+
+    const actions =
+        document.createElement("div");
+
+    actions.className =
+        "premiere-fois-carte-actions";
+
+
+    if (!realisee) {
+
+        const boutonModifier =
+            document.createElement("button");
+
+        boutonModifier.type =
+            "button";
+
+        boutonModifier.className =
+            "modifier-premiere-fois";
+
+        boutonModifier.textContent =
+            "Modifier";
+
+        boutonModifier.addEventListener(
+            "click",
+            function() {
+
+                ouvrirModificationPremiereFois(
+                    premiereFois
+                );
+
+            }
+        );
+
+
+        const boutonSupprimer =
+            document.createElement("button");
+
+        boutonSupprimer.type =
+            "button";
+
+        boutonSupprimer.className =
+            "supprimer-premiere-fois";
+
+        boutonSupprimer.textContent =
+            "Supprimer";
+
+        boutonSupprimer.addEventListener(
+            "click",
+            function() {
+
+                supprimerPremiereFois(
+                    premiereFois
+                );
+
+            }
+        );
+
+
+        actions.appendChild(
+            boutonModifier
+        );
+
+        actions.appendChild(
+            boutonSupprimer
+        );
+
+
+    } else {
+
+        const boutonCorriger =
+            document.createElement("button");
+
+        boutonCorriger.type =
+            "button";
+
+        boutonCorriger.className =
+            "corriger-premiere-fois";
+
+        boutonCorriger.textContent =
+            "Corriger l’attribution";
+
+        boutonCorriger.addEventListener(
+            "click",
+            function() {
+
+                corrigerPremiereFois(
+                    premiereFois,
+                    boutonCorriger
+                );
+
+            }
+        );
+
+
+        actions.appendChild(
+            boutonCorriger
+        );
+
+    }
+
+
+    carte.appendChild(
+        actions
+    );
+
+
+    return carte;
+
+}
+
+
+function afficherPremieresFois() {
+
+    const aVivre =
+        premieresFois.filter(
+            function(premiereFois) {
+
+                return (
+                    premiereFois.stay_id === null
+                );
+
+            }
+        );
+
+    const realisees =
+        premieresFois.filter(
+            function(premiereFois) {
+
+                return (
+                    premiereFois.stay_id !== null
+                );
+
+            }
+        );
+
+
+    nombrePremieresFoisAVivre.textContent =
+        aVivre.length;
+
+    nombrePremieresFoisRealisees.textContent =
+        realisees.length;
+
+
+    if (
+        aVivre.length === 0 &&
+        realisees.length === 0
+    ) {
+
+        premieresFoisCompteur.textContent =
+            "Aucune première fois ajoutée";
+
+    } else {
+
+        premieresFoisCompteur.textContent =
+            `${realisees.length} vécue${
+                realisees.length > 1
+                    ? "s"
+                    : ""
+            } · ${aVivre.length} à découvrir`;
+
+    }
+
+
+    listePremieresFoisAVivre.innerHTML =
+        "";
+
+    listePremieresFoisRealisees.innerHTML =
+        "";
+
+
+    if (aVivre.length === 0) {
+
+        listePremieresFoisAVivre.appendChild(
+            creerTexteVide(
+                "Toutes vos idées ont été vécues… ou la prochaine reste encore à imaginer."
+            )
+        );
+
+    } else {
+
+        aVivre.forEach(
+            function(premiereFois) {
+
+                listePremieresFoisAVivre
+                    .appendChild(
+                        creerCartePremiereFois(
+                            premiereFois
+                        )
+                    );
+
+            }
+        );
+
+    }
+
+
+    if (realisees.length === 0) {
+
+        listePremieresFoisRealisees.appendChild(
+            creerTexteVide(
+                "Les badges débloqués apparaîtront ici."
+            )
+        );
+
+    } else {
+
+        realisees.forEach(
+            function(premiereFois) {
+
+                listePremieresFoisRealisees
+                    .appendChild(
+                        creerCartePremiereFois(
+                            premiereFois
+                        )
+                    );
+
+            }
+        );
+
+    }
+
+}
+
+// =========================
+// BADGES DANS UN SÉJOUR
+// =========================
+
+function obtenirPremieresFoisDuSejour(
+    sejourId
+) {
+
+    if (!sejourId) {
+        return [];
+    }
+
+
+    return premieresFois.filter(
+        function(premiereFois) {
+
+            return (
+                Number(premiereFois.stay_id) ===
+                Number(sejourId)
+            );
+
+        }
+    );
+
+}
+
+
+function creerBadgePremiereFois(
+    premiereFois
+) {
+
+    const categorie =
+        obtenirCategoriePremiereFois(
+            premiereFois.category
+        );
+
+
+    const badge =
+        document.createElement("article");
+
+    badge.className =
+        "badge-premiere-fois";
+
+
+    const icone =
+        document.createElement("span");
+
+    icone.className =
+        "badge-premiere-fois-icone";
+
+    icone.textContent =
+        categorie.icone;
+
+
+    const contenu =
+        document.createElement("div");
+
+    contenu.className =
+        "badge-premiere-fois-contenu";
+
+
+    const etiquette =
+        document.createElement("small");
+
+    etiquette.textContent =
+        "Première fois";
+
+
+    const titre =
+        document.createElement("strong");
+
+    titre.textContent =
+        premiereFois.title;
+
+
+    contenu.appendChild(
+        etiquette
+    );
+
+    contenu.appendChild(
+        titre
+    );
+
+
+    const date =
+        document.createElement("time");
+
+
+    if (premiereFois.unlocked_on) {
+
+        date.dateTime =
+            premiereFois.unlocked_on;
+
+        date.textContent =
+            formaterDate(
+                premiereFois.unlocked_on
+            );
+
+    } else {
+
+        date.textContent =
+            "Pendant ce séjour";
+
+    }
+
+
+    contenu.appendChild(
+        date
+    );
+
+
+    badge.appendChild(
+        icone
+    );
+
+    badge.appendChild(
+        contenu
+    );
+
+
+    return badge;
+
+}
+
+
+function afficherBadgesPremieresFois(
+    sejourId
+) {
+
+    const badges =
+        obtenirPremieresFoisDuSejour(
+            sejourId
+        );
+
+
+    vuePremieresFois.innerHTML =
+        "";
+
+
+    if (badges.length === 0) {
+
+        vuePremieresFoisSection.hidden =
+            true;
+
+        return;
+
+    }
+
+
+    vuePremieresFoisSection.hidden =
+        false;
+
+
+    badges.forEach(
+        function(premiereFois) {
+
+            vuePremieresFois.appendChild(
+                creerBadgePremiereFois(
+                    premiereFois
+                )
+            );
+
+        }
+    );
+
+}
+
+// =========================
+// SÉLECTION DANS LE FORMULAIRE
+// =========================
+
+function creerPremiereFoisDejaAttribuee(
+    premiereFois
+) {
+
+    const categorie =
+        obtenirCategoriePremiereFois(
+            premiereFois.category
+        );
+
+
+    const element =
+        document.createElement("div");
+
+    element.className =
+        "premiere-fois-attribuee";
+
+
+    const icone =
+        document.createElement("span");
+
+    icone.className =
+        "premiere-fois-attribuee-icone";
+
+    icone.textContent =
+        categorie.icone;
+
+
+    const contenu =
+        document.createElement("div");
+
+
+    const titre =
+        document.createElement("strong");
+
+    titre.textContent =
+        premiereFois.title;
+
+
+    const indication =
+        document.createElement("small");
+
+    indication.textContent =
+        premiereFois.unlocked_on
+            ? `Badge débloqué le ${formaterDate(
+                premiereFois.unlocked_on
+            )}`
+            : "Badge déjà débloqué pendant ce séjour";
+
+
+    contenu.appendChild(
+        titre
+    );
+
+    contenu.appendChild(
+        indication
+    );
+
+
+    element.appendChild(
+        icone
+    );
+
+    element.appendChild(
+        contenu
+    );
+
+
+    return element;
+
+}
+
+
+function creerOptionPremiereFois(
+    premiereFois
+) {
+
+    const categorie =
+        obtenirCategoriePremiereFois(
+            premiereFois.category
+        );
+
+
+    const option =
+        document.createElement("div");
+
+    option.className =
+        "premiere-fois-option";
+
+
+    const checkbox =
+        document.createElement("input");
+
+    checkbox.type =
+        "checkbox";
+
+    checkbox.className =
+        "premiere-fois-checkbox";
+
+    checkbox.value =
+        premiereFois.id;
+
+    checkbox.id =
+        `debloquer-${premiereFois.id}`;
+
+    checkbox.dataset.title =
+        premiereFois.title;
+
+
+    const contenu =
+        document.createElement("label");
+
+    contenu.className =
+        "premiere-fois-option-contenu";
+
+    contenu.htmlFor =
+        checkbox.id;
+
+
+    const titre =
+        document.createElement("strong");
+
+    titre.textContent =
+        premiereFois.title;
+
+
+    const details =
+        document.createElement("small");
+
+    details.textContent =
+        categorie.nom;
+
+
+    contenu.appendChild(
+        titre
+    );
+
+    contenu.appendChild(
+        details
+    );
+
+
+    const date =
+        document.createElement("input");
+
+    date.type =
+        "date";
+
+    date.className =
+        "premiere-fois-date";
+
+    date.disabled =
+        true;
+
+    date.setAttribute(
+        "aria-label",
+        `Date de la première fois : ${premiereFois.title}`
+    );
+
+
+    checkbox.addEventListener(
+        "change",
+        function() {
+
+            date.disabled =
+                !checkbox.checked;
+
+
+            if (checkbox.checked) {
+
+                const dateDebut =
+                    document
+                        .querySelector(
+                            "#souvenir-debut"
+                        )
+                        .value;
+
+                const dateFin =
+                    document
+                        .querySelector(
+                            "#souvenir-fin"
+                        )
+                        .value;
+
+
+                date.min =
+                    dateDebut || "";
+
+                date.max =
+                    dateFin || "";
+
+
+                if (
+                    !date.value &&
+                    dateDebut
+                ) {
+
+                    date.value =
+                        dateDebut;
+
+                }
+
+            } else {
+
+                date.value =
+                    "";
+
+            }
+
+        }
+    );
+
+
+    option.appendChild(
+        checkbox
+    );
+
+    option.appendChild(
+        contenu
+    );
+
+    option.appendChild(
+        date
+    );
+
+
+    return option;
+
+}
+
+
+function afficherSelectionPremieresFois(
+    sejourId
+) {
+
+    const disponibles =
+        premieresFois.filter(
+            function(premiereFois) {
+
+                return (
+                    premiereFois.stay_id === null
+                );
+
+            }
+        );
+
+    const dejaAttribuees =
+        obtenirPremieresFoisDuSejour(
+            sejourId
+        );
+
+
+    premieresFoisDejaAttribuees.innerHTML =
+        "";
+
+    premieresFoisSelection.innerHTML =
+        "";
+
+
+    dejaAttribuees.forEach(
+        function(premiereFois) {
+
+            premieresFoisDejaAttribuees
+                .appendChild(
+                    creerPremiereFoisDejaAttribuee(
+                        premiereFois
+                    )
+                );
+
+        }
+    );
+
+
+    disponibles.forEach(
+        function(premiereFois) {
+
+            premieresFoisSelection
+                .appendChild(
+                    creerOptionPremiereFois(
+                        premiereFois
+                    )
+                );
+
+        }
+    );
+
+
+    premieresFoisSelectionVide.hidden =
+        disponibles.length !== 0;
+
+}
+
+
+function obtenirPremieresFoisSelectionnees() {
+
+    return Array.from(
+        premieresFoisSelection.querySelectorAll(
+            ".premiere-fois-checkbox:checked"
+        )
+    ).map(
+        function(checkbox) {
+
+            const option =
+                checkbox.closest(
+                    ".premiere-fois-option"
+                );
+
+            const date =
+                option.querySelector(
+                    ".premiere-fois-date"
+                );
+
+
+            return {
+
+                id:
+                    checkbox.value,
+
+                title:
+                    checkbox.dataset.title,
+
+                unlocked_on:
+                    date.value || null
+
+            };
+
+        }
+    );
+
+}
+
+
+// =========================
+// ENVOI À SUPABASE
+// =========================
+
+async function debloquerPremieresFois(
+    sejourId,
+    selections
+) {
+
+    if (selections.length === 0) {
+        return;
+    }
+
+
+    const elements =
+        selections.map(
+            function(selection) {
+
+                return {
+
+                    id:
+                        selection.id,
+
+                    unlocked_on:
+                        selection.unlocked_on
+
+                };
+
+            }
+        );
+
+
+    const {
+        error
+    } = await supabaseClient.rpc(
+        "unlock_first_times",
+        {
+
+            p_stay_id:
+                sejourId,
+
+            p_unlocks:
+                elements
+
+        }
+    );
+
+
+    if (error) {
+
+        console.error(
+            "Déblocage des premières fois impossible :",
+            error
+        );
+
+        throw error;
+
+    }
+
+
+    await chargerPremieresFois();
+
+}
+
+// =========================
+// FORMULAIRE
+// =========================
+
+function fermerFormulairePremiereFois() {
+
+    premiereFoisForm.reset();
+
+    premiereFoisId.value =
+        "";
+
+    premiereFoisCategorie.value =
+        "Amor";
+
+    premiereFoisMessage.textContent =
+        "";
+
+    premiereFoisForm.hidden =
+        true;
+
+    boutonAfficherFormulairePremiereFois.hidden =
+        false;
+
+    boutonEnregistrerPremiereFois.textContent =
+        "Ajouter à notre liste";
+
+    boutonEnregistrerPremiereFois.disabled =
+        false;
+
+}
+
+
+function ouvrirAjoutPremiereFois() {
+
+    fermerFormulairePremiereFois();
+
+    premiereFoisForm.hidden =
+        false;
+
+    boutonAfficherFormulairePremiereFois.hidden =
+        true;
+
+    premiereFoisTitreInput.focus();
+
+}
+
+
+function ouvrirModificationPremiereFois(
+    premiereFois
+) {
+
+    premiereFoisId.value =
+        premiereFois.id;
+
+    premiereFoisTitreInput.value =
+        premiereFois.title;
+
+    premiereFoisCategorie.value =
+        premiereFois.category;
+
+    premiereFoisDescription.value =
+        premiereFois.description ?? "";
+
+    premiereFoisMessage.textContent =
+        "";
+
+    premiereFoisForm.hidden =
+        false;
+
+    boutonAfficherFormulairePremiereFois.hidden =
+        true;
+
+    boutonEnregistrerPremiereFois.textContent =
+        "Enregistrer les modifications";
+
+
+    premiereFoisForm.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+
+    premiereFoisTitreInput.focus();
+
+}
+
+
+// =========================
+// AJOUT ET MODIFICATION
+// =========================
+
+premiereFoisForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const titre =
+            premiereFoisTitreInput
+                .value
+                .trim();
+
+        const description =
+            premiereFoisDescription
+                .value
+                .trim();
+
+        const identifiant =
+            premiereFoisId.value;
+
+
+        if (!titre) {
+
+            premiereFoisMessage.textContent =
+                "Indiquez la première fois que vous souhaitez vivre.";
+
+            return;
+
+        }
+
+
+        boutonEnregistrerPremiereFois.disabled =
+            true;
+
+        boutonEnregistrerPremiereFois.textContent =
+            "Enregistrement…";
+
+        premiereFoisMessage.textContent =
+            "";
+
+
+        const donnees = {
+
+            title:
+                titre,
+
+            description:
+                description || null,
+
+            category:
+                premiereFoisCategorie.value
+
+        };
+
+
+        try {
+
+            let error;
+
+
+            if (identifiant) {
+
+                const resultat =
+                    await supabaseClient
+                        .from("first_times")
+                        .update(donnees)
+                        .eq(
+                            "id",
+                            identifiant
+                        )
+                        .is(
+                            "stay_id",
+                            null
+                        );
+
+                error =
+                    resultat.error;
+
+            } else {
+
+                const ordreMaximum =
+                    premieresFois.reduce(
+                        function(maximum, premiereFois) {
+
+                            return Math.max(
+                                maximum,
+                                premiereFois.sort_order ?? 0
+                            );
+
+                        },
+                        -1
+                    );
+
+
+                donnees.sort_order =
+                    ordreMaximum + 1;
+
+
+                const resultat =
+                    await supabaseClient
+                        .from("first_times")
+                        .insert(donnees);
+
+                error =
+                    resultat.error;
+
+            }
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            await chargerPremieresFois();
+
+            fermerFormulairePremiereFois();
+
+
+        } catch (erreur) {
+
+            console.error(
+                "Enregistrement de la première fois impossible :",
+                erreur
+            );
+
+
+            boutonEnregistrerPremiereFois.disabled =
+                false;
+
+            boutonEnregistrerPremiereFois.textContent =
+                identifiant
+                    ? "Enregistrer les modifications"
+                    : "Ajouter à notre liste";
+
+
+            if (erreur.code === "23505") {
+
+                premiereFoisMessage.textContent =
+                    "Cette première fois existe déjà dans votre liste.";
+
+            } else {
+
+                premiereFoisMessage.textContent =
+                    `Enregistrement impossible : ${erreur.message}`;
+
+            }
+
+        }
+
+    }
+);
+
+// =========================
+// CORRECTION D’UN BADGE
+// =========================
+
+async function corrigerPremiereFois(
+    premiereFois,
+    bouton
+) {
+
+    const ville =
+        premiereFois.stay?.city?.name ??
+        "ce séjour";
+
+
+    const premiereConfirmation =
+        window.confirm(
+            `Corriger l’attribution de « ${premiereFois.title} » ?\n\nLe badge est actuellement associé à ${ville}.`
+        );
+
+
+    if (!premiereConfirmation) {
+        return;
+    }
+
+
+    const secondeConfirmation =
+        window.confirm(
+            `Confirmer la remise dans « À vivre » ?\n\n« ${premiereFois.title} » ne sera plus associée à ${ville}. Vous pourrez ensuite la débloquer dans le bon séjour.`
+        );
+
+
+    if (!secondeConfirmation) {
+        return;
+    }
+
+
+    bouton.disabled =
+        true;
+
+    bouton.textContent =
+        "Correction…";
+
+
+    try {
+
+        const {
+            error
+        } = await supabaseClient.rpc(
+            "reset_first_time",
+            {
+                p_first_time_id:
+                    premiereFois.id
+            }
+        );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        await chargerPremieresFois();
+
+
+    } catch (erreur) {
+
+        console.error(
+            "Correction du badge impossible :",
+            erreur
+        );
+
+        window.alert(
+            "La correction a échoué. Réessayez."
+        );
+
+
+        bouton.disabled =
+            false;
+
+        bouton.textContent =
+            "Corriger l’attribution";
+
+    }
+
+}
+
+// =========================
+// SUPPRESSION
+// =========================
+
+async function supprimerPremiereFois(
+    premiereFois
+) {
+
+    const confirmation =
+        window.confirm(
+            `Supprimer « ${premiereFois.title} » de votre liste ?`
+        );
+
+
+    if (!confirmation) {
+        return;
+    }
+
+
+    try {
+
+        const {
+            error
+        } = await supabaseClient
+            .from("first_times")
+            .delete()
+            .eq(
+                "id",
+                premiereFois.id
+            )
+            .is(
+                "stay_id",
+                null
+            );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        await chargerPremieresFois();
+
+
+        if (
+            premiereFoisId.value ===
+            premiereFois.id
+        ) {
+
+            fermerFormulairePremiereFois();
+
+        }
+
+
+    } catch (erreur) {
+
+        console.error(
+            "Suppression de la première fois impossible :",
+            erreur
+        );
+
+        window.alert(
+            "La suppression a échoué. Réessayez."
+        );
+
+    }
+
+}
+
+
+// =========================
+// OUVERTURE ET FERMETURE
+// =========================
+
+boutonOuvrirPremieresFois.addEventListener(
+    "click",
+    async function() {
+
+        fermerFormulairePremiereFois();
+
+        premieresFoisDialog.showModal();
+
+
+        listePremieresFoisAVivre.textContent =
+            "Chargement…";
+
+        listePremieresFoisRealisees.textContent =
+            "Chargement…";
+
+
+        try {
+
+            await chargerPremieresFois();
+
+        } catch (erreur) {
+
+            listePremieresFoisAVivre.textContent =
+                "Impossible de charger la liste.";
+
+            listePremieresFoisRealisees.textContent =
+                "";
+
+        }
+
+    }
+);
+
+
+boutonFermerPremieresFois.addEventListener(
+    "click",
+    function() {
+
+        premieresFoisDialog.close();
+
+    }
+);
+
+
+premieresFoisDialog.addEventListener(
+    "click",
+    function(event) {
+
+        if (event.target === premieresFoisDialog) {
+
+            premieresFoisDialog.close();
+
+        }
+
+    }
+);
+
+
+boutonAfficherFormulairePremiereFois
+    .addEventListener(
+        "click",
+        ouvrirAjoutPremiereFois
+    );
+
+
+boutonAnnulerPremiereFois.addEventListener(
+    "click",
+    fermerFormulairePremiereFois
+);
 
 // =========================
 // FENÊTRE D’AJOUT D’UNE VILLE

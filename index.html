@@ -410,6 +410,49 @@
 
         </section>
 
+        <!-- =========================
+            PREMIÈRES FOIS — RÉSUMÉ
+        ========================= -->
+
+        <section class="premieres-fois-resume">
+
+            <div class="premieres-fois-resume-icone">
+                ✦
+            </div>
+
+            <div class="premieres-fois-resume-texte">
+
+                <p class="premieres-fois-label">
+                    Notre liste à deux
+                </p>
+
+                <h2>Nos premières fois</h2>
+
+                <p>
+                    Les expériences que nous rêvons encore
+                    de vivre et celles qui appartiennent
+                    déjà à notre histoire.
+                </p>
+
+            </div>
+
+            <div class="premieres-fois-resume-actions">
+
+                <p id="premieres-fois-compteur">
+                    Aucune première fois ajoutée
+                </p>
+
+                <button
+                    id="ouvrir-premieres-fois"
+                    class="ouvrir-premieres-fois"
+                    type="button">
+                    Découvrir notre liste
+                </button>
+
+            </div>
+
+        </section>
+
         <section class="map-section">
 
             <div class="map-header">
@@ -482,6 +525,275 @@
 
     </main>
 
+    <!-- =========================
+        NOS PREMIÈRES FOIS
+    ========================= -->
+
+    <dialog
+        id="premieres-fois-dialog"
+        class="premieres-fois-dialog"
+        aria-labelledby="premieres-fois-titre">
+
+        <div class="premieres-fois-header">
+
+            <div>
+
+                <p class="premieres-fois-label">
+                    Notre collection
+                </p>
+
+                <h2 id="premieres-fois-titre">
+                    Nos premières fois
+                </h2>
+
+                <p class="premieres-fois-introduction">
+                    Des envies à partager aujourd’hui,
+                    des souvenirs uniques demain.
+                </p>
+
+            </div>
+
+            <button
+                id="fermer-premieres-fois"
+                class="fermer-premieres-fois"
+                type="button"
+                aria-label="Fermer">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="premieres-fois-statistiques">
+
+            <div>
+                <strong id="nombre-premieres-fois-a-vivre">
+                    0
+                </strong>
+
+                <span>à vivre</span>
+            </div>
+
+            <div>
+                <strong id="nombre-premieres-fois-realisees">
+                    0
+                </strong>
+
+                <span>déjà vécues</span>
+            </div>
+
+        </div>
+
+
+        <section class="premiere-fois-ajout">
+
+            <div class="premiere-fois-section-titre">
+
+                <div>
+
+                    <p class="premieres-fois-label">
+                        Une nouvelle idée
+                    </p>
+
+                    <h3>Ajouter une première fois</h3>
+
+                </div>
+
+                <button
+                    id="afficher-formulaire-premiere-fois"
+                    class="afficher-formulaire-premiere-fois"
+                    type="button">
+                    <span aria-hidden="true">＋</span>
+                    Ajouter
+                </button>
+
+            </div>
+
+
+            <form
+                id="premiere-fois-form"
+                class="premiere-fois-form"
+                hidden>
+
+                <input
+                    id="premiere-fois-id"
+                    type="hidden">
+
+
+                <label class="premiere-fois-champ">
+
+                    Première fois à vivre
+
+                    <input
+                        id="premiere-fois-titre-input"
+                        type="text"
+                        maxlength="120"
+                        placeholder="Exemple : Faire du canoë ensemble"
+                        required>
+
+                </label>
+
+
+                <label class="premiere-fois-champ">
+
+                    Catégorie
+
+                    <select
+                        id="premiere-fois-categorie"
+                        required>
+
+                        <option value="aventure">
+                            Amor
+                        </option>
+
+                        <option value="aventure">
+                            Aventure
+                        </option>
+
+                        <option value="voyage">
+                            Voyage
+                        </option>
+
+                        <option value="gastronomie">
+                            Gastronomie
+                        </option>
+
+                        <option value="culture">
+                            Culture
+                        </option>
+
+                        <option value="nature">
+                            Nature
+                        </option>
+
+                        <option value="quotidien">
+                            Quotidien
+                        </option>
+
+                        <option value="evenement">
+                            Événement
+                        </option>
+
+                        <option value="autre">
+                            Autre
+                        </option>
+
+                    </select>
+
+                </label>
+
+
+                <label class="premiere-fois-champ">
+
+                    Quelques précisions
+                    <span>Facultatif</span>
+
+                    <textarea
+                        id="premiere-fois-description"
+                        maxlength="500"
+                        rows="3"
+                        placeholder="Une envie, une idée ou un détail à retenir…">
+                    </textarea>
+
+                </label>
+
+
+                <p
+                    id="premiere-fois-message"
+                    class="premiere-fois-message"
+                    aria-live="polite">
+                </p>
+
+
+                <div class="premiere-fois-form-actions">
+
+                    <button
+                        id="enregistrer-premiere-fois"
+                        class="enregistrer-premiere-fois"
+                        type="submit">
+                        Ajouter à notre liste
+                    </button>
+
+                    <button
+                        id="annuler-premiere-fois"
+                        class="annuler-premiere-fois"
+                        type="button">
+                        Annuler
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <div class="premieres-fois-colonnes">
+
+            <section class="premieres-fois-colonne">
+
+                <div class="premiere-fois-colonne-titre">
+
+                    <span class="premiere-fois-puce a-vivre">
+                    </span>
+
+                    <div>
+                        <p class="premieres-fois-label">
+                            Notre liste
+                        </p>
+
+                        <h3>À vivre ensemble</h3>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="liste-premieres-fois-a-vivre"
+                    class="liste-premieres-fois">
+
+                    <p class="premieres-fois-vide">
+                        Ajoutez votre première envie à deux.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="premieres-fois-colonne realisees">
+
+                <div class="premiere-fois-colonne-titre">
+
+                    <span class="premiere-fois-puce realisee">
+                    </span>
+
+                    <div>
+                        <p class="premieres-fois-label">
+                            Nos badges
+                        </p>
+
+                        <h3>Déjà vécues</h3>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="liste-premieres-fois-realisees"
+                    class="liste-premieres-fois">
+
+                    <p class="premieres-fois-vide">
+                        Les badges débloqués apparaîtront ici.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </dialog>
 
     <!-- =========================
         AJOUT D’UNE VILLE
@@ -927,6 +1239,38 @@
 
                 </section>
 
+                <!-- PREMIÈRES FOIS -->
+
+                <section
+                    id="vue-premieres-fois-section"
+                    class="fiche-rubrique"
+                    hidden>
+
+                    <div class="rubrique-titre">
+
+                        <span class="rubrique-numero">
+                            04
+                        </span>
+
+                        <div>
+
+                            <p class="souvenir-sur-titre">
+                                Uniquement ici
+                            </p>
+
+                            <h3>Nos premières fois</h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="vue-premieres-fois"
+                        class="badges-premieres-fois">
+                    </div>
+
+                </section>
 
                 <!-- PHOTOS -->
 
@@ -934,7 +1278,7 @@
 
                     <div class="rubrique-titre">
 
-                        <span class="rubrique-numero">04</span>
+                        <span class="rubrique-numero">05</span>
 
                         <div>
 
@@ -970,7 +1314,7 @@
 
                     <div class="rubrique-titre">
 
-                        <span class="rubrique-numero">05</span>
+                        <span class="rubrique-numero">06</span>
 
                         <div>
 
@@ -1184,13 +1528,67 @@
 
                 </section>
 
+                <!-- PREMIÈRES FOIS DU SÉJOUR -->
+
+                <section class="fiche-rubrique">
+
+                    <div class="rubrique-titre">
+
+                        <span class="rubrique-numero">
+                            04
+                        </span>
+
+                        <div>
+
+                            <p class="souvenir-sur-titre">
+                                Un moment inédit
+                            </p>
+
+                            <h3>
+                                Premières fois vécues ici
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="fiche-secondaire">
+                        Sélectionnez uniquement les expériences
+                        vécues ensemble pour la toute première fois
+                        pendant ce séjour.
+                    </p>
+
+
+                    <div
+                        id="premieres-fois-deja-attribuees"
+                        class="premieres-fois-deja-attribuees">
+                    </div>
+
+
+                    <div
+                        id="premieres-fois-selection"
+                        class="premieres-fois-selection">
+                    </div>
+
+
+                    <p
+                        id="premieres-fois-selection-vide"
+                        class="media-vide"
+                        hidden>
+                        Aucune première fois n’attend encore
+                        d’être vécue.
+                    </p>
+
+                </section>
+
                 <!-- AJOUT DES PHOTOS -->
 
                 <section class="fiche-rubrique">
 
                     <div class="rubrique-titre">
 
-                        <span class="rubrique-numero">04</span>
+                        <span class="rubrique-numero">05</span>
 
                         <div>
 
@@ -1258,7 +1656,7 @@
 
                     <div class="rubrique-titre">
 
-                        <span class="rubrique-numero">05</span>
+                        <span class="rubrique-numero">06</span>
 
                         <div>
 
