@@ -221,6 +221,49 @@ async function chargerDestinationsDepuisSupabase() {
                 nombreSejours:
                     sejours.length,
 
+                sejoursResume:
+                    sejours.map(
+                        function(sejour) {
+
+                            return {
+                                id: sejour.id,
+                                date:
+                                    sejour.date_start ??
+                                    sejour.created_at
+                            };
+
+                        }
+                    ),
+
+                dernierSejourId:
+                    dernierSejour?.id ?? null,
+
+                nombrePhotos:
+                    sejours.reduce(
+                        function(total, sejour) {
+
+                            return total +
+                                (sejour.stay_media ?? [])
+                                    .filter(
+                                        function(media) {
+
+                                            return (
+                                                media.media_type ===
+                                                "photo"
+                                            );
+
+                                        }
+                                    ).length;
+
+                        },
+                        0
+                    ),
+
+                dateDernierSejour:
+                    dernierSejour?.date_start ??
+                    dernierSejour?.created_at ??
+                    null,
+
                 apercuPhrase:
                     dernierSejour?.shared_quote ??
                     "",
@@ -776,7 +819,429 @@ function actualiserStatistiques() {
 
     }
 
+
+    actualiserTableauDeBord();
+
 }
+
+
+let destinationDernierSouvenir = null;
+let suggestionPremiereFoisId = null;
+
+
+function formaterDateTableauDeBord(date) {
+
+    if (!date) {
+        return "Date à compléter";
+    }
+
+    return new Intl.DateTimeFormat(
+        "fr-FR",
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    ).format(
+        new Date(date)
+    );
+
+}
+
+
+function obtenirDestinationDernierSouvenir() {
+
+    return destinations
+        .filter(
+            function(destination) {
+
+                return destination.nombreSejours > 0;
+
+            }
+        )
+        .sort(
+            function(destinationA, destinationB) {
+
+                return (
+                    new Date(
+                        destinationB.dateDernierSejour
+                    ).getTime() -
+                    new Date(
+                        destinationA.dateDernierSejour
+                    ).getTime()
+                );
+
+            }
+        )[0] ?? null;
+
+}
+
+
+function choisirSuggestionPremiereFois(forceNouvelle = false) {
+
+    const suggestions =
+        premieresFois.filter(
+            function(premiereFois) {
+
+                return premiereFois.stay_id === null;
+
+            }
+        );
+
+
+    if (suggestions.length === 0) {
+        suggestionPremiereFoisId = null;
+        return null;
+    }
+
+
+    const suggestionActuelle =
+        suggestions.find(
+            function(premiereFois) {
+
+                return (
+                    premiereFois.id ===
+                    suggestionPremiereFoisId
+                );
+
+            }
+        );
+
+
+    if (suggestionActuelle && !forceNouvelle) {
+        return suggestionActuelle;
+    }
+
+
+    const possibilites =
+        forceNouvelle && suggestions.length > 1
+            ? suggestions.filter(
+                function(premiereFois) {
+
+                    return (
+                        premiereFois.id !==
+                        suggestionPremiereFoisId
+                    );
+
+                }
+            )
+            : suggestions;
+
+
+    const suggestion =
+        possibilites[
+            Math.floor(
+                Math.random() * possibilites.length
+            )
+        ];
+
+    suggestionPremiereFoisId = suggestion.id;
+
+    return suggestion;
+
+}
+
+
+function actualiserSuggestionPremiereFois(
+    forceNouvelle = false
+) {
+
+    const titre = document.querySelector(
+        "#dashboard-suggestion-titre"
+    );
+
+    if (!titre) {
+        return;
+    }
+
+
+    const description = document.querySelector(
+        "#dashboard-suggestion-description"
+    );
+
+    const icone = document.querySelector(
+        "#dashboard-suggestion-icone"
+    );
+
+    const boutonAutre = document.querySelector(
+        "#dashboard-autre-suggestion"
+    );
+
+    const suggestion =
+        choisirSuggestionPremiereFois(
+            forceNouvelle
+        );
+
+
+    if (!suggestion) {
+
+        titre.textContent =
+            "Une première fois à imaginer";
+
+        description.textContent =
+            "Ajoutez des envies pour laisser AMOR vous en proposer une.";
+
+        icone.textContent = "✦";
+        boutonAutre.hidden = true;
+
+        return;
+
+    }
+
+
+    const categorie =
+        obtenirCategoriePremiereFois(
+            suggestion.category
+        );
+
+    titre.textContent = suggestion.title;
+
+    description.textContent =
+        suggestion.description ||
+        `Une suggestion ${categorie.nom.toLowerCase()} à vivre ensemble, si l’envie vous prend.`;
+
+    icone.textContent = categorie.icone;
+    boutonAutre.hidden = false;
+
+}
+
+
+function actualiserTableauDeBord() {
+
+    const tableauDeBord =
+        document.querySelector(".tableau-bord");
+
+    if (!tableauDeBord) {
+        return;
+    }
+
+
+    const nombreVilles = destinations.length;
+
+    const nombreSejours = destinations.reduce(
+        function(total, destination) {
+
+            return total + destination.nombreSejours;
+
+        },
+        0
+    );
+
+    const nombrePhotos = destinations.reduce(
+        function(total, destination) {
+
+            return total + destination.nombrePhotos;
+
+        },
+        0
+    );
+
+    const nombreBadges = premieresFois.filter(
+        function(premiereFois) {
+
+            return premiereFois.stay_id !== null;
+
+        }
+    ).length;
+
+    const progression = Math.min(
+        (nombreVilles / 20) * 100,
+        100
+    );
+
+
+    document.querySelector("#stat-sejours")
+        .textContent = nombreSejours;
+
+    document.querySelector("#stat-photos")
+        .textContent = nombrePhotos;
+
+    document.querySelector("#stat-badges")
+        .textContent = nombreBadges;
+
+    document.querySelector(
+        "#dashboard-progression-villes"
+    ).textContent = nombreVilles;
+
+    document.querySelector(
+        "#dashboard-progression-pourcentage"
+    ).textContent = `${Math.round(progression)} %`;
+
+    document.querySelector(
+        "#dashboard-barre-valeur"
+    ).style.width = `${progression}%`;
+
+    const barre = document.querySelector(
+        ".dashboard-barre"
+    );
+
+    barre.setAttribute(
+        "aria-valuenow",
+        nombreVilles
+    );
+
+
+    destinationDernierSouvenir =
+        obtenirDestinationDernierSouvenir();
+
+    const carteDernier = document.querySelector(
+        "#dashboard-dernier-souvenir"
+    );
+
+    const photoDernier = document.querySelector(
+        "#dashboard-dernier-photo"
+    );
+
+    const boutonDernier = document.querySelector(
+        "#dashboard-ouvrir-dernier"
+    );
+
+
+    if (destinationDernierSouvenir) {
+
+        document.querySelector(
+            "#dashboard-dernier-ville"
+        ).textContent = destinationDernierSouvenir.ville;
+
+        document.querySelector(
+            "#dashboard-dernier-date"
+        ).textContent = formaterDateTableauDeBord(
+            destinationDernierSouvenir.dateDernierSejour
+        );
+
+        document.querySelector(
+            "#dashboard-dernier-phrase"
+        ).textContent =
+            destinationDernierSouvenir.apercuPhrase ||
+            "Un souvenir à compléter ensemble.";
+
+        boutonDernier.disabled = false;
+
+
+        if (destinationDernierSouvenir.urlPhotoPrincipale) {
+
+            photoDernier.src =
+                destinationDernierSouvenir.urlPhotoPrincipale;
+
+            photoDernier.alt =
+                `Souvenir de ${destinationDernierSouvenir.ville}`;
+
+            photoDernier.hidden = false;
+            carteDernier.classList.add("avec-photo");
+
+        } else {
+
+            photoDernier.hidden = true;
+            photoDernier.removeAttribute("src");
+            carteDernier.classList.remove("avec-photo");
+
+        }
+
+    } else {
+
+        boutonDernier.disabled = true;
+        photoDernier.hidden = true;
+        carteDernier.classList.remove("avec-photo");
+
+    }
+
+
+    const boutonHasard = document.querySelector(
+        "#dashboard-souvenir-hasard"
+    );
+
+    boutonHasard.disabled = nombreSejours === 0;
+
+    actualiserSuggestionPremiereFois();
+
+}
+
+
+document.querySelector(
+    "#dashboard-ouvrir-dernier"
+).addEventListener(
+    "click",
+    function() {
+
+        if (destinationDernierSouvenir) {
+            ouvrirFiche(
+                destinationDernierSouvenir,
+                destinationDernierSouvenir
+                    .dernierSejourId
+            );
+        }
+
+    }
+);
+
+
+document.querySelector(
+    "#dashboard-souvenir-hasard"
+).addEventListener(
+    "click",
+    function() {
+
+        const souvenirsDisponibles =
+            destinations.flatMap(
+                function(destination) {
+
+                    return destination.sejoursResume.map(
+                        function(sejour) {
+
+                            return {
+                                destination,
+                                sejourId: sejour.id
+                            };
+
+                        }
+                    );
+
+                }
+            );
+
+        if (souvenirsDisponibles.length === 0) {
+            return;
+        }
+
+        const souvenir =
+            souvenirsDisponibles[
+                Math.floor(
+                    Math.random() *
+                    souvenirsDisponibles.length
+                )
+            ];
+
+        ouvrirFiche(
+            souvenir.destination,
+            souvenir.sejourId
+        );
+
+    }
+);
+
+
+document.querySelector(
+    "#dashboard-autre-suggestion"
+).addEventListener(
+    "click",
+    function() {
+
+        actualiserSuggestionPremiereFois(true);
+
+    }
+);
+
+
+document.querySelector(
+    "#dashboard-ouvrir-premieres-fois"
+).addEventListener(
+    "click",
+    function() {
+
+        boutonOuvrirPremieresFois.click();
+
+    }
+);
 
 async function actualiserCarteSouvenirs() {
 
@@ -3040,7 +3505,10 @@ function afficherModeEdition() {
 // OUVERTURE DE LA FICHE
 // =========================
 
-async function ouvrirFiche(destination) {
+async function ouvrirFiche(
+    destination,
+    sejourId = null
+) {
 
     destinationActive =
         destination;
@@ -3064,7 +3532,21 @@ async function ouvrirFiche(destination) {
                 destination
             );
 
-        indexSejourActif = 0;
+        indexSejourActif = sejourId
+            ? Math.max(
+                0,
+                sejoursActifs.findIndex(
+                    function(sejour) {
+
+                        return (
+                            Number(sejour.id) ===
+                            Number(sejourId)
+                        );
+
+                    }
+                )
+            )
+            : 0;
 
         souvenirsActifs =
             sejoursActifs[indexSejourActif];
@@ -5200,6 +5682,9 @@ function afficherPremieresFois() {
         );
 
     }
+
+
+    actualiserTableauDeBord();
 
 }
 

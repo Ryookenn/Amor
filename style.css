@@ -4000,3 +4000,474 @@ textarea {
     }
 
 }
+
+
+/* =========================
+   TABLEAU DE BORD
+========================= */
+
+.tableau-bord {
+    padding: 10px 6% 100px;
+}
+
+.tableau-bord-entete {
+    max-width: 720px;
+    margin-bottom: 34px;
+}
+
+.tableau-bord-label {
+    margin: 0;
+
+    color: var(--wine);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.tableau-bord-entete h2 {
+    margin: 9px 0 12px;
+
+    color: var(--wine-dark);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2.3rem, 5vw, 4rem);
+    font-weight: 400;
+    line-height: 1.02;
+}
+
+.tableau-bord-entete > p:last-child {
+    margin: 0;
+
+    color: var(--text-muted);
+    line-height: 1.65;
+}
+
+.tableau-bord-grille {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
+    gap: 20px;
+}
+
+.dashboard-dernier-souvenir {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    display: flex;
+    align-items: flex-end;
+
+    min-height: 570px;
+    padding: 38px;
+
+    border: 1px solid rgba(127, 38, 62, 0.16);
+    border-radius: 28px;
+
+    background:
+        radial-gradient(
+            circle at 80% 15%,
+            rgba(216, 160, 146, 0.34),
+            transparent 40%
+        ),
+        linear-gradient(
+            145deg,
+            var(--wine-dark),
+            var(--wine)
+        );
+
+    color: white;
+}
+
+.dashboard-dernier-photo,
+.dashboard-dernier-voile {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+
+    width: 100%;
+    height: 100%;
+}
+
+.dashboard-dernier-photo {
+    object-fit: cover;
+}
+
+.dashboard-dernier-voile {
+    z-index: -1;
+    background:
+        linear-gradient(
+            to top,
+            rgba(32, 12, 20, 0.92) 0%,
+            rgba(32, 12, 20, 0.5) 52%,
+            rgba(32, 12, 20, 0.12) 100%
+        );
+}
+
+.dashboard-dernier-souvenir:not(.avec-photo)
+.dashboard-dernier-voile {
+    background:
+        radial-gradient(
+            circle at 85% 10%,
+            rgba(255, 250, 247, 0.2),
+            transparent 38%
+        );
+}
+
+.dashboard-dernier-contenu {
+    max-width: 560px;
+}
+
+.dashboard-dernier-contenu .tableau-bord-label {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.dashboard-dernier-contenu h3 {
+    margin: 10px 0 5px;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 400;
+    line-height: 0.95;
+}
+
+.dashboard-dernier-date {
+    margin: 0 0 20px;
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 0.82rem;
+}
+
+.dashboard-dernier-contenu > p:not(.tableau-bord-label):not(.dashboard-dernier-date) {
+    max-width: 480px;
+    margin: 0 0 24px;
+
+    color: rgba(255, 255, 255, 0.88);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.15rem;
+    font-style: italic;
+    line-height: 1.55;
+}
+
+.dashboard-bouton,
+.dashboard-bouton-clair,
+.dashboard-lien {
+    min-height: 44px;
+    padding: 0 17px;
+
+    border-radius: 999px;
+
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.dashboard-bouton {
+    border: 1px solid var(--wine);
+    background: var(--wine);
+    color: white;
+}
+
+.dashboard-bouton-clair {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.14);
+    color: white;
+    backdrop-filter: blur(8px);
+}
+
+.dashboard-lien {
+    padding-inline: 8px;
+    border: 0;
+    background: transparent;
+    color: var(--wine);
+}
+
+.dashboard-bouton:hover,
+.dashboard-bouton-clair:hover {
+    filter: brightness(0.9);
+}
+
+.dashboard-bouton:disabled,
+.dashboard-bouton-clair:disabled {
+    cursor: default;
+    opacity: 0.48;
+}
+
+.dashboard-colonne {
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    gap: 20px;
+}
+
+.dashboard-carte {
+    padding: 25px;
+
+    border: 1px solid rgba(127, 38, 62, 0.14);
+    border-radius: 24px;
+
+    background: var(--surface);
+}
+
+.dashboard-carte h3,
+.dashboard-geographie h3 {
+    margin: 7px 0 9px;
+
+    color: var(--wine-dark);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.45rem;
+    font-weight: 400;
+    line-height: 1.15;
+}
+
+.dashboard-carte p:not(.tableau-bord-label) {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    line-height: 1.55;
+}
+
+.dashboard-suggestion {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-content: center;
+    gap: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--surface),
+            rgba(216, 160, 146, 0.14)
+        );
+}
+
+.dashboard-carte-icone {
+    display: grid;
+    place-items: center;
+
+    width: 50px;
+    height: 50px;
+
+    border-radius: 50%;
+    background: var(--wine);
+    color: white;
+
+    font-size: 1.25rem;
+}
+
+.dashboard-suggestion-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    grid-column: 1 / -1;
+}
+
+.dashboard-hasard {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.dashboard-hasard .dashboard-bouton {
+    flex-shrink: 0;
+}
+
+.dashboard-progression-entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.dashboard-progression-entete h3 {
+    margin-bottom: 0;
+}
+
+.dashboard-progression-entete > strong {
+    color: var(--wine);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.dashboard-barre {
+    overflow: hidden;
+    height: 7px;
+    margin-top: 20px;
+
+    border-radius: 999px;
+    background: rgba(127, 38, 62, 0.12);
+}
+
+.dashboard-barre > div {
+    width: 0;
+    height: 100%;
+
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--wine), #d8a092);
+
+    transition: width 500ms ease;
+}
+
+.dashboard-compteurs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+
+    margin-top: 20px;
+}
+
+.dashboard-compteurs > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 20px 22px;
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+}
+
+.dashboard-compteurs strong,
+.dashboard-territoires strong {
+    color: var(--wine);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 2rem;
+    font-weight: 400;
+}
+
+.dashboard-compteurs span,
+.dashboard-territoires span {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+
+.dashboard-geographie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+
+    margin-top: 20px;
+    padding: 26px 28px;
+
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--surface);
+}
+
+.dashboard-geographie h3 {
+    margin-bottom: 0;
+}
+
+.dashboard-territoires {
+    display: flex;
+    gap: 34px;
+}
+
+.dashboard-territoires p {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+
+    .tableau-bord-grille {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-dernier-souvenir {
+        min-height: 480px;
+    }
+
+    .dashboard-compteurs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .tableau-bord {
+        padding: 0 20px 70px;
+    }
+
+    .tableau-bord-entete {
+        margin-bottom: 24px;
+    }
+
+    .tableau-bord-entete h2 {
+        font-size: clamp(2.35rem, 12vw, 3.2rem);
+    }
+
+    .dashboard-dernier-souvenir {
+        min-height: 450px;
+        padding: 25px;
+        border-radius: 22px;
+    }
+
+    .dashboard-dernier-contenu h3 {
+        font-size: clamp(2.8rem, 15vw, 4rem);
+    }
+
+    .dashboard-colonne {
+        gap: 14px;
+    }
+
+    .dashboard-carte {
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    .dashboard-suggestion {
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .dashboard-carte-icone {
+        width: 42px;
+        height: 42px;
+    }
+
+    .dashboard-suggestion-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .dashboard-hasard {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-compteurs {
+        gap: 10px;
+    }
+
+    .dashboard-compteurs > div {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 17px;
+    }
+
+    .dashboard-geographie {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 22px;
+    }
+
+    .dashboard-territoires {
+        gap: 12px;
+    }
+
+    .dashboard-territoires p {
+        align-items: flex-start;
+        flex: 1;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+}

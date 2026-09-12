@@ -63,7 +63,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=mobile-1"
+        href="style.css?v=dashboard-1"
     >
 </head>
 
@@ -497,30 +497,159 @@
 
         </section>
 
-        <section class="stats-section" aria-labelledby="stats-title">
+        <section
+            class="tableau-bord"
+            aria-labelledby="tableau-bord-titre">
 
-            <h2 id="stats-title">
-                Nos trips en chiffres
-            </h2>
+            <div class="tableau-bord-entete">
+                <p class="tableau-bord-label">Notre histoire</p>
+                <h2 id="tableau-bord-titre">
+                    Notre histoire en un regard
+                </h2>
+                <p>
+                    Les lieux, les instants et les premières fois
+                    qui dessinent notre histoire.
+                </p>
+            </div>
 
-            <div class="stats-grid">
+            <div class="tableau-bord-grille">
 
-                <div class="stat-card">
-                    <span class="stat-number" id="stat-villes">—</span>
-                    <span class="stat-label">Villes visitées</span>
-                </div>
+                <article
+                    id="dashboard-dernier-souvenir"
+                    class="dashboard-dernier-souvenir">
 
-                <div class="stat-card">
-                    <span class="stat-number" id="stat-departements">—</span>
-                    <span class="stat-label">Départements découverts</span>
-                </div>
+                    <img
+                        id="dashboard-dernier-photo"
+                        src=""
+                        alt=""
+                        hidden>
 
-                <div class="stat-card">
-                    <span class="stat-number" id="stat-regions">—</span>
-                    <span class="stat-label">Régions explorées</span>
+                    <div class="dashboard-dernier-voile"></div>
+
+                    <div class="dashboard-dernier-contenu">
+                        <p class="tableau-bord-label">
+                            Notre dernier souvenir
+                        </p>
+                        <h3 id="dashboard-dernier-ville">
+                            Notre prochaine destination
+                        </h3>
+                        <p
+                            id="dashboard-dernier-date"
+                            class="dashboard-dernier-date">
+                        </p>
+                        <p id="dashboard-dernier-phrase">
+                            Notre histoire commence ici.
+                        </p>
+                        <button
+                            id="dashboard-ouvrir-dernier"
+                            class="dashboard-bouton-clair"
+                            type="button">
+                            Revoir ce souvenir
+                        </button>
+                    </div>
+
+                </article>
+
+                <div class="dashboard-colonne">
+
+                    <article class="dashboard-carte dashboard-suggestion">
+                        <span
+                            id="dashboard-suggestion-icone"
+                            class="dashboard-carte-icone">
+                            ✦
+                        </span>
+                        <div>
+                            <p class="tableau-bord-label">
+                                Une idée pour nous deux
+                            </p>
+                            <h3 id="dashboard-suggestion-titre">
+                                Une première fois à imaginer
+                            </h3>
+                            <p id="dashboard-suggestion-description">
+                                Ajoutez des envies pour laisser AMOR vous en proposer une.
+                            </p>
+                        </div>
+                        <div class="dashboard-suggestion-actions">
+                            <button
+                                id="dashboard-autre-suggestion"
+                                class="dashboard-lien"
+                                type="button">
+                                Une autre idée
+                            </button>
+                            <button
+                                id="dashboard-ouvrir-premieres-fois"
+                                class="dashboard-bouton"
+                                type="button">
+                                Voir notre liste
+                            </button>
+                        </div>
+                    </article>
+
+                    <article class="dashboard-carte dashboard-hasard">
+                        <div>
+                            <p class="tableau-bord-label">
+                                Remonter le temps
+                            </p>
+                            <h3>Un souvenir au hasard</h3>
+                            <p>
+                                Laissons AMOR choisir un instant à revivre.
+                            </p>
+                        </div>
+                        <button
+                            id="dashboard-souvenir-hasard"
+                            class="dashboard-bouton"
+                            type="button">
+                            Fais-nous voyager
+                        </button>
+                    </article>
+
+                    <article class="dashboard-carte dashboard-progression">
+                        <div class="dashboard-progression-entete">
+                            <div>
+                                <p class="tableau-bord-label">
+                                    Notre progression
+                                </p>
+                                <h3>
+                                    <span id="dashboard-progression-villes">0</span>
+                                    villes sur 20
+                                </h3>
+                            </div>
+                            <strong id="dashboard-progression-pourcentage">
+                                0 %
+                            </strong>
+                        </div>
+                        <div
+                            class="dashboard-barre"
+                            role="progressbar"
+                            aria-label="Progression vers 20 villes"
+                            aria-valuemin="0"
+                            aria-valuemax="20"
+                            aria-valuenow="0">
+                            <div id="dashboard-barre-valeur"></div>
+                        </div>
+                    </article>
+
                 </div>
 
             </div>
+
+            <div class="dashboard-compteurs">
+                <div><strong id="stat-villes">0</strong><span>Villes</span></div>
+                <div><strong id="stat-sejours">0</strong><span>Séjours</span></div>
+                <div><strong id="stat-photos">0</strong><span>Photos</span></div>
+                <div><strong id="stat-badges">0</strong><span>Premières fois</span></div>
+            </div>
+
+            <article class="dashboard-geographie">
+                <div>
+                    <p class="tableau-bord-label">Notre géographie</p>
+                    <h3>Les territoires que nous avons découverts</h3>
+                </div>
+                <div class="dashboard-territoires">
+                    <p><strong id="stat-regions">0</strong><span>Régions explorées</span></p>
+                    <p><strong id="stat-departements">0</strong><span>Départements découverts</span></p>
+                </div>
+            </article>
 
         </section>
 
@@ -1827,7 +1956,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="app.js?v=mobile-1"></script>
+    <script src="app.js?v=dashboard-1"></script>
 
 </body>
 
