@@ -63,7 +63,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=dashboard-1"
+        href="style.css?v=homes-1"
     >
 </head>
 
@@ -454,6 +454,29 @@
 
         </section>
 
+        <!-- =========================
+            NOS DEUX CHEZ-NOUS
+        ========================= -->
+
+        <section
+            class="homes-section"
+            aria-labelledby="homes-titre">
+
+            <div class="homes-entete">
+                <p class="map-label">Nos points d’ancrage</p>
+                <h2 id="homes-titre">Nos deux chez-nous</h2>
+                <p>
+                    Deux villes que nous découvrons ensemble,
+                    et deux pages qui grandissent avec nous.
+                </p>
+            </div>
+
+            <div id="homes-liste" class="homes-liste">
+                <p class="homes-chargement">Chargement de nos chez-nous…</p>
+            </div>
+
+        </section>
+
         <section class="map-section">
 
             <div class="map-header">
@@ -528,7 +551,7 @@
 
                     <div class="dashboard-dernier-contenu">
                         <p class="tableau-bord-label">
-                            Notre dernier souvenir
+                            Notre dernier moment
                         </p>
                         <h3 id="dashboard-dernier-ville">
                             Notre prochaine destination
@@ -590,7 +613,7 @@
                             <p class="tableau-bord-label">
                                 Remonter le temps
                             </p>
-                            <h3>Un souvenir au hasard</h3>
+                            <h3>Un moment au hasard</h3>
                             <p>
                                 Laissons AMOR choisir un instant à revivre.
                             </p>
@@ -919,6 +942,216 @@
 
                 </div>
 
+            </section>
+
+        </div>
+
+    </dialog>
+
+    <!-- =========================
+        FICHE PERMANENTE D’UN HOME
+    ========================= -->
+
+    <dialog
+        id="home-dialog"
+        class="home-dialog"
+        aria-labelledby="home-ville">
+
+        <header class="home-header">
+            <div>
+                <p id="home-tagline" class="home-tagline"></p>
+                <h2 id="home-ville"></h2>
+            </div>
+
+            <button
+                id="fermer-home"
+                class="fermer-home"
+                type="button"
+                aria-label="Fermer la fiche">
+                ×
+            </button>
+        </header>
+
+        <div class="home-contenu">
+
+            <section class="home-introduction-carte">
+                <div>
+                    <p class="home-sur-titre">Ce lieu pour nous</p>
+                    <p id="home-introduction" class="home-introduction"></p>
+                </div>
+
+                <button
+                    id="modifier-home"
+                    class="home-bouton-secondaire"
+                    type="button">
+                    Modifier
+                </button>
+
+                <form id="home-profil-form" class="home-profil-form" hidden>
+                    <label>
+                        Le nom de ce chez-nous
+                        <input
+                            id="home-tagline-input"
+                            type="text"
+                            maxlength="80"
+                            required>
+                    </label>
+
+                    <label>
+                        Ce que ce lieu représente pour nous
+                        <textarea
+                            id="home-introduction-input"
+                            rows="4"
+                            maxlength="1000"
+                            placeholder="Une phrase, une ambiance, ce que cette ville raconte de nous…"></textarea>
+                    </label>
+
+                    <div class="home-form-actions">
+                        <button class="home-bouton" type="submit">
+                            Enregistrer
+                        </button>
+                        <button
+                            id="annuler-home-profil"
+                            class="home-bouton-secondaire"
+                            type="button">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="home-rubrique">
+                <div class="home-rubrique-entete">
+                    <div>
+                        <p class="home-sur-titre">Au fil du temps</p>
+                        <h3>Notre album ici</h3>
+                    </div>
+
+                    <label class="home-ajout-photo">
+                        <span>＋</span>
+                        Ajouter des photos
+                        <input
+                            id="home-ajout-photos"
+                            type="file"
+                            accept="image/*"
+                            multiple>
+                    </label>
+                </div>
+
+                <p id="home-photo-message" class="home-message"></p>
+                <div id="home-galerie" class="home-galerie"></div>
+                <p id="home-galerie-vide" class="home-vide">
+                    L’album attend encore sa première photo.
+                </p>
+            </section>
+
+            <section class="home-rubrique">
+                <div class="home-rubrique-entete">
+                    <div>
+                        <p class="home-sur-titre">Nos petits fragments</p>
+                        <h3>Anecdotes et habitudes</h3>
+                    </div>
+
+                    <button
+                        id="ajouter-home-item"
+                        class="home-bouton"
+                        type="button">
+                        ＋ Ajouter
+                    </button>
+                </div>
+
+                <form id="home-item-form" class="home-item-form" hidden>
+                    <input id="home-item-id" type="hidden">
+
+                    <label>
+                        Type
+                        <select id="home-item-type" required>
+                            <option value="anecdote">Anecdote</option>
+                            <option value="habit">Habitude</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Titre
+                        <input
+                            id="home-item-title"
+                            type="text"
+                            maxlength="120"
+                            required>
+                    </label>
+
+                    <label class="home-item-contenu-champ">
+                        Ce que nous voulons retenir
+                        <textarea
+                            id="home-item-content"
+                            rows="4"
+                            maxlength="1200"></textarea>
+                    </label>
+
+                    <label>
+                        Date <span>facultative</span>
+                        <input id="home-item-date" type="date">
+                    </label>
+
+                    <p id="home-item-message" class="home-message"></p>
+
+                    <div class="home-form-actions">
+                        <button class="home-bouton" type="submit">
+                            Enregistrer ce fragment
+                        </button>
+                        <button
+                            id="annuler-home-item"
+                            class="home-bouton-secondaire"
+                            type="button">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+
+                <div id="home-items" class="home-items"></div>
+                <p id="home-items-vide" class="home-vide">
+                    Les anecdotes et habitudes que vous choisirez de garder apparaîtront ici.
+                </p>
+            </section>
+
+            <section id="home-badges-section" class="home-rubrique">
+                <div class="home-rubrique-entete">
+                    <div>
+                        <p class="home-sur-titre">Vécues ici</p>
+                        <h3>Nos premières fois</h3>
+                    </div>
+                    <button
+                        id="ajouter-home-badge"
+                        class="home-bouton-secondaire"
+                        type="button">
+                        Débloquer un badge
+                    </button>
+                </div>
+                <form id="home-badge-form" class="home-badge-form" hidden>
+                    <label>
+                        Première fois vécue ici
+                        <select id="home-badge-select" required></select>
+                    </label>
+                    <label>
+                        Date <span>facultative</span>
+                        <input id="home-badge-date" type="date">
+                    </label>
+                    <div class="home-form-actions">
+                        <button class="home-bouton" type="submit">
+                            Débloquer ici
+                        </button>
+                        <button
+                            id="annuler-home-badge"
+                            class="home-bouton-secondaire"
+                            type="button">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+                <div id="home-badges" class="badges-premieres-fois"></div>
+                <p id="home-badges-vide" class="home-vide">
+                    Les premières fois vécues ici apparaîtront dans cette collection.
+                </p>
             </section>
 
         </div>
@@ -1956,7 +2189,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="app.js?v=dashboard-1"></script>
+    <script src="app.js?v=homes-1"></script>
 
 </body>
 

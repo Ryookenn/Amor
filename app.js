@@ -50,6 +50,18 @@ const destinationIcon = L.divIcon({
     popupAnchor: [0, -24]
 });
 
+const homeIcon = L.divIcon({
+    className: "destination-marker home-marker",
+    html: `
+        <div class="marker-circle home-marker-circle">
+            <span aria-hidden="true">⌂</span>
+        </div>
+    `,
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
+    popupAnchor: [0, -26]
+});
+
 // =========================
 // GROUPE DES MARQUEURS
 // =========================
@@ -90,6 +102,13 @@ async function chargerDestinationsDepuisSupabase() {
             longitude,
             region,
             department,
+            experience_type,
+            home_owner,
+            home_pages (
+                tagline,
+                introduction,
+                updated_at
+            ),
             stays (
                 id,
                 date_start,
@@ -136,6 +155,13 @@ async function chargerDestinationsDepuisSupabase() {
 
     destinations = data.map(
         function(villeSupabase) {
+
+            const pageHomeBrute =
+                villeSupabase.home_pages;
+
+            const pageHome = Array.isArray(pageHomeBrute)
+                ? pageHomeBrute[0] ?? null
+                : pageHomeBrute ?? null;
 
             const sejours =
                 [...(villeSupabase.stays ?? [])];
@@ -217,6 +243,16 @@ async function chargerDestinationsDepuisSupabase() {
 
                 departement:
                     villeSupabase.department,
+
+                experienceType:
+                    villeSupabase.experience_type ??
+                    "travel",
+
+                homeOwner:
+                    villeSupabase.home_owner ?? null,
+
+                homePage:
+                    pageHome,
 
                 nombreSejours:
                     sejours.length,
@@ -353,6 +389,7 @@ async function chargerDestinationsDepuisSupabase() {
 
 
     afficherDestinations();
+    afficherHomesAccueil();
     actualiserStatistiques();
 
 }
@@ -391,10 +428,19 @@ function formaterNoteApercu(note) {
 
 function creerContenuSurvol(destination) {
 
-    const texteSejours =
-        destination.nombreSejours === 1
-            ? "1 séjour"
-            : `${destination.nombreSejours} séjours`;
+    const estHome =
+        destination.experienceType === "home";
+
+    const texteSejours = estHome
+        ? (
+            destination.homePage?.tagline ||
+            libelleHomeParDefaut(destination)
+        )
+        : (
+            destination.nombreSejours === 1
+                ? "1 séjour"
+                : `${destination.nombreSejours} séjours`
+        );
 
 
     const photo =
@@ -415,12 +461,43 @@ function creerContenuSurvol(destination) {
             `;
 
 
-    const phrase =
-        destination.apercuPhrase
+    const phrase = estHome
+        ? echapperHtml(
+            destination.homePage?.introduction ||
+            "Notre page vivante, enrichie au fil du temps."
+        )
+        : destination.apercuPhrase
             ? `« ${echapperHtml(
                 destination.apercuPhrase
             )} »`
             : "Phrase du séjour à compléter";
+
+
+    const notes = estHome
+        ? ""
+        : `
+            <div class="apercu-ville-notes">
+
+                <span>
+                    <small>Amine</small>
+                    <strong>
+                        ${formaterNoteApercu(
+                            destination.apercuNoteAmine
+                        )}
+                    </strong>
+                </span>
+
+                <span>
+                    <small>Maéna</small>
+                    <strong>
+                        ${formaterNoteApercu(
+                            destination.apercuNoteMaena
+                        )}
+                    </strong>
+                </span>
+
+            </div>
+        `;
 
 
     return `
@@ -462,27 +539,7 @@ function creerContenuSurvol(destination) {
                 </p>
 
 
-                <div class="apercu-ville-notes">
-
-                    <span>
-                        <small>Amine</small>
-                        <strong>
-                            ${formaterNoteApercu(
-                                destination.apercuNoteAmine
-                            )}
-                        </strong>
-                    </span>
-
-                    <span>
-                        <small>Maéna</small>
-                        <strong>
-                            ${formaterNoteApercu(
-                                destination.apercuNoteMaena
-                            )}
-                        </strong>
-                    </span>
-
-                </div>
+                ${notes}
 
             </div>
 
@@ -642,7 +699,10 @@ function afficherDestinations() {
                     destination.longitude
                 ],
                 {
-                    icon: destinationIcon,
+                    icon:
+                        destination.experienceType === "home"
+                            ? homeIcon
+                            : destinationIcon,
                     title: destination.ville,
                     alt: destination.ville
                 }
@@ -1021,6 +1081,10 @@ function actualiserTableauDeBord() {
     const nombreSejours = destinations.reduce(
         function(total, destination) {
 
+            if (destination.experienceType === "home") {
+                return total;
+            }
+
             return total + destination.nombreSejours;
 
         },
@@ -1150,7 +1214,16 @@ function actualiserTableauDeBord() {
         "#dashboard-souvenir-hasard"
     );
 
-    boutonHasard.disabled = nombreSejours === 0;
+    boutonHasard.disabled = !destinations.some(
+        function(destination) {
+
+            return (
+                destination.experienceType === "home" ||
+                destination.nombreSejours > 0
+            );
+
+        }
+    );
 
     actualiserSuggestionPremiereFois();
 
@@ -1184,6 +1257,16 @@ document.querySelector(
         const souvenirsDisponibles =
             destinations.flatMap(
                 function(destination) {
+
+                    if (
+                        destination.experienceType ===
+                        "home"
+                    ) {
+                        return [{
+                            destination,
+                            sejourId: null
+                        }];
+                    }
 
                     return destination.sejoursResume.map(
                         function(sejour) {
@@ -3509,6 +3592,13 @@ async function ouvrirFiche(
     destination,
     sejourId = null
 ) {
+
+    if (destination.experienceType === "home") {
+
+        await ouvrirFicheHome(destination);
+        return;
+
+    }
 
     destinationActive =
         destination;
@@ -7483,3 +7573,752 @@ if ("serviceWorker" in navigator) {
     );
 
 }
+
+
+// =========================
+// NOS DEUX CHEZ-NOUS
+// =========================
+
+const homeDialog = document.querySelector("#home-dialog");
+const fermerHome = document.querySelector("#fermer-home");
+const homeVille = document.querySelector("#home-ville");
+const homeTagline = document.querySelector("#home-tagline");
+const homeIntroduction = document.querySelector("#home-introduction");
+const modifierHome = document.querySelector("#modifier-home");
+const homeProfilForm = document.querySelector("#home-profil-form");
+const homeTaglineInput = document.querySelector("#home-tagline-input");
+const homeIntroductionInput = document.querySelector("#home-introduction-input");
+const annulerHomeProfil = document.querySelector("#annuler-home-profil");
+const homeAjoutPhotos = document.querySelector("#home-ajout-photos");
+const homePhotoMessage = document.querySelector("#home-photo-message");
+const homeGalerie = document.querySelector("#home-galerie");
+const homeGalerieVide = document.querySelector("#home-galerie-vide");
+const ajouterHomeItem = document.querySelector("#ajouter-home-item");
+const homeItemForm = document.querySelector("#home-item-form");
+const homeItemId = document.querySelector("#home-item-id");
+const homeItemType = document.querySelector("#home-item-type");
+const homeItemTitle = document.querySelector("#home-item-title");
+const homeItemContent = document.querySelector("#home-item-content");
+const homeItemDate = document.querySelector("#home-item-date");
+const homeItemMessage = document.querySelector("#home-item-message");
+const annulerHomeItem = document.querySelector("#annuler-home-item");
+const homeItems = document.querySelector("#home-items");
+const homeItemsVide = document.querySelector("#home-items-vide");
+const homeBadgesSection = document.querySelector("#home-badges-section");
+const homeBadges = document.querySelector("#home-badges");
+const homeBadgesVide = document.querySelector("#home-badges-vide");
+const ajouterHomeBadge = document.querySelector("#ajouter-home-badge");
+const homeBadgeForm = document.querySelector("#home-badge-form");
+const homeBadgeSelect = document.querySelector("#home-badge-select");
+const homeBadgeDate = document.querySelector("#home-badge-date");
+const annulerHomeBadge = document.querySelector("#annuler-home-badge");
+
+let homeActif = null;
+let homeItemsActifs = [];
+let homeMediasActifs = [];
+
+
+function libelleHomeParDefaut(destination) {
+
+    if (destination.homeOwner === "amine") {
+        return "Chez Amine";
+    }
+
+    if (destination.homeOwner === "maena") {
+        return "Chez Maéna";
+    }
+
+    return "Notre chez-nous";
+
+}
+
+
+function afficherHomesAccueil() {
+
+    const liste = document.querySelector("#homes-liste");
+
+    if (!liste) {
+        return;
+    }
+
+    const homes = destinations.filter(
+        function(destination) {
+            return destination.experienceType === "home";
+        }
+    );
+
+    liste.innerHTML = "";
+
+    if (homes.length === 0) {
+        const vide = document.createElement("p");
+        vide.className = "homes-chargement";
+        vide.textContent = "Aucun chez-nous configuré pour le moment.";
+        liste.appendChild(vide);
+        return;
+    }
+
+    homes.sort(
+        function(a, b) {
+            const ordre = { amine: 0, maena: 1, shared: 2 };
+            return (ordre[a.homeOwner] ?? 3) - (ordre[b.homeOwner] ?? 3);
+        }
+    );
+
+    homes.forEach(
+        function(destination) {
+
+            const carte = document.createElement("article");
+            carte.className = "home-carte";
+
+            if (destination.urlPhotoPrincipale) {
+                const image = document.createElement("img");
+                image.src = destination.urlPhotoPrincipale;
+                image.alt = `Notre chez-nous à ${destination.ville}`;
+                carte.appendChild(image);
+                carte.classList.add("avec-photo");
+            }
+
+            const voile = document.createElement("div");
+            voile.className = "home-carte-voile";
+
+            const contenu = document.createElement("div");
+            contenu.className = "home-carte-contenu";
+
+            const etiquette = document.createElement("p");
+            etiquette.textContent =
+                destination.homePage?.tagline ||
+                libelleHomeParDefaut(destination);
+
+            const titre = document.createElement("h3");
+            titre.textContent = destination.ville;
+
+            const description = document.createElement("p");
+            description.className = "home-carte-description";
+            description.textContent =
+                destination.homePage?.introduction ||
+                `${destination.nombrePhotos} photo${destination.nombrePhotos > 1 ? "s" : ""} dans notre album.`;
+
+            const bouton = document.createElement("button");
+            bouton.type = "button";
+            bouton.textContent = "Entrer chez nous";
+            bouton.addEventListener("click", function() {
+                ouvrirFicheHome(destination);
+            });
+
+            contenu.append(etiquette, titre, description, bouton);
+            carte.append(voile, contenu);
+            liste.appendChild(carte);
+
+        }
+    );
+
+}
+
+
+function idsSejoursHome(destination) {
+
+    return (destination.sejoursResume ?? []).map(
+        function(sejour) {
+            return sejour.id;
+        }
+    );
+
+}
+
+
+async function chargerProfilHome(destination) {
+
+    const { data, error } = await supabaseClient
+        .from("home_pages")
+        .select("city_id, tagline, introduction, updated_at")
+        .eq("city_id", destination.id)
+        .maybeSingle();
+
+    if (error) {
+        throw error;
+    }
+
+    destination.homePage = data ?? {
+        city_id: destination.id,
+        tagline: libelleHomeParDefaut(destination),
+        introduction: null
+    };
+
+    homeTagline.textContent =
+        destination.homePage.tagline ||
+        libelleHomeParDefaut(destination);
+
+    homeVille.textContent = destination.ville;
+
+    homeIntroduction.textContent =
+        destination.homePage.introduction ||
+        "Cette page grandira avec les photos, les habitudes et les petits fragments que nous choisirons de garder.";
+
+}
+
+
+async function chargerPhotosHome(destination) {
+
+    homeGalerie.innerHTML = "";
+    homeGalerieVide.hidden = false;
+    homeMediasActifs = [];
+
+    const sejourIds = idsSejoursHome(destination);
+
+    if (sejourIds.length === 0) {
+        photosAffichees = [];
+        return;
+    }
+
+    const { data: medias, error } = await supabaseClient
+        .from("stay_media")
+        .select("id, stay_id, storage_path, original_name, created_at")
+        .in("stay_id", sejourIds)
+        .eq("media_type", "photo")
+        .order("created_at", { ascending: true });
+
+    if (error) {
+        throw error;
+    }
+
+    if (!medias || medias.length === 0) {
+        photosAffichees = [];
+        return;
+    }
+
+    const { data: liens, error: erreurLiens } = await supabaseClient
+        .storage
+        .from("memories")
+        .createSignedUrls(
+            medias.map(function(media) {
+                return media.storage_path;
+            }),
+            3600
+        );
+
+    if (erreurLiens) {
+        throw erreurLiens;
+    }
+
+    homeMediasActifs = medias;
+
+    photosAffichees = medias.map(
+        function(media, index) {
+            return {
+                url: liens[index]?.signedUrl ?? "",
+                texteAlternatif:
+                    media.original_name ||
+                    `Photo de ${destination.ville}`
+            };
+        }
+    );
+
+    medias.forEach(
+        function(media, index) {
+
+            const cadre = document.createElement("div");
+            cadre.className = "home-photo";
+
+            const boutonPhoto = document.createElement("button");
+            boutonPhoto.type = "button";
+            boutonPhoto.className = "home-photo-ouvrir";
+            boutonPhoto.setAttribute(
+                "aria-label",
+                `Ouvrir ${photosAffichees[index].texteAlternatif}`
+            );
+
+            const image = document.createElement("img");
+            image.src = photosAffichees[index].url;
+            image.alt = photosAffichees[index].texteAlternatif;
+            boutonPhoto.appendChild(image);
+            boutonPhoto.addEventListener("click", function() {
+                ouvrirVisionneuse(index);
+            });
+
+            const supprimer = document.createElement("button");
+            supprimer.type = "button";
+            supprimer.className = "home-photo-supprimer";
+            supprimer.textContent = "×";
+            supprimer.setAttribute("aria-label", "Supprimer cette photo");
+            supprimer.addEventListener("click", function() {
+                supprimerPhotoHome(media, supprimer);
+            });
+
+            cadre.append(boutonPhoto, supprimer);
+            homeGalerie.appendChild(cadre);
+
+        }
+    );
+
+    homeGalerieVide.hidden = true;
+
+}
+
+
+async function obtenirSejourSupportHome(destination) {
+
+    const existant = destination.sejoursResume?.[0];
+
+    if (existant) {
+        return existant;
+    }
+
+    const { data, error } = await supabaseClient
+        .from("stays")
+        .insert({ city_id: destination.id })
+        .select("id, created_at")
+        .single();
+
+    if (error) {
+        throw error;
+    }
+
+    destination.sejoursResume = [
+        { id: data.id, date: data.created_at }
+    ];
+
+    destination.nombreSejours = 1;
+
+    return destination.sejoursResume[0];
+
+}
+
+
+async function supprimerPhotoHome(media, bouton) {
+
+    if (!window.confirm("Supprimer définitivement cette photo de notre album ?")) {
+        return;
+    }
+
+    bouton.disabled = true;
+
+    try {
+        const { error } = await supabaseClient
+            .from("stay_media")
+            .delete()
+            .eq("id", media.id);
+
+        if (error) {
+            throw error;
+        }
+
+        const { error: erreurFichier } = await supabaseClient
+            .storage
+            .from("memories")
+            .remove([media.storage_path]);
+
+        if (erreurFichier) {
+            console.warn("Nettoyage du fichier impossible :", erreurFichier);
+        }
+
+        await chargerPhotosHome(homeActif);
+        await chargerDestinationsDepuisSupabase();
+
+    } catch (erreur) {
+        console.error("Suppression de la photo impossible :", erreur);
+        bouton.disabled = false;
+        window.alert("La photo n’a pas pu être supprimée.");
+    }
+
+}
+
+
+async function chargerItemsHome(destination) {
+
+    const { data, error } = await supabaseClient
+        .from("home_items")
+        .select("id, city_id, item_type, title, content, happened_on, sort_order, created_at")
+        .eq("city_id", destination.id)
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        throw error;
+    }
+
+    homeItemsActifs = data ?? [];
+    afficherItemsHome();
+
+}
+
+
+function afficherItemsHome() {
+
+    homeItems.innerHTML = "";
+    homeItemsVide.hidden = homeItemsActifs.length > 0;
+
+    homeItemsActifs.forEach(
+        function(item) {
+
+            const carte = document.createElement("article");
+            carte.className = `home-item ${item.item_type}`;
+
+            const meta = document.createElement("p");
+            meta.className = "home-item-meta";
+            meta.textContent = item.item_type === "habit"
+                ? "Notre habitude"
+                : "Notre anecdote";
+
+            if (item.happened_on) {
+                meta.textContent += ` · ${formaterDate(item.happened_on)}`;
+            }
+
+            const titre = document.createElement("h4");
+            titre.textContent = item.title;
+
+            carte.append(meta, titre);
+
+            if (item.content) {
+                const texte = document.createElement("p");
+                texte.className = "home-item-texte";
+                texte.textContent = item.content;
+                carte.appendChild(texte);
+            }
+
+            const actions = document.createElement("div");
+            actions.className = "home-item-actions";
+
+            const modifier = document.createElement("button");
+            modifier.type = "button";
+            modifier.textContent = "Modifier";
+            modifier.addEventListener("click", function() {
+                ouvrirFormulaireHomeItem(item);
+            });
+
+            const supprimer = document.createElement("button");
+            supprimer.type = "button";
+            supprimer.textContent = "Supprimer";
+            supprimer.addEventListener("click", function() {
+                supprimerHomeItem(item);
+            });
+
+            actions.append(modifier, supprimer);
+            carte.appendChild(actions);
+            homeItems.appendChild(carte);
+
+        }
+    );
+
+}
+
+
+function fermerFormulaireHomeItem() {
+    homeItemForm.reset();
+    homeItemId.value = "";
+    homeItemMessage.textContent = "";
+    homeItemForm.hidden = true;
+    ajouterHomeItem.hidden = false;
+}
+
+
+function ouvrirFormulaireHomeItem(item = null) {
+
+    fermerFormulaireHomeItem();
+    homeItemForm.hidden = false;
+    ajouterHomeItem.hidden = true;
+
+    if (item) {
+        homeItemId.value = item.id;
+        homeItemType.value = item.item_type;
+        homeItemTitle.value = item.title;
+        homeItemContent.value = item.content ?? "";
+        homeItemDate.value = item.happened_on ?? "";
+    }
+
+    homeItemTitle.focus();
+}
+
+
+async function supprimerHomeItem(item) {
+
+    if (!window.confirm(`Supprimer « ${item.title} » ?`)) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from("home_items")
+        .delete()
+        .eq("id", item.id);
+
+    if (error) {
+        window.alert("Ce fragment n’a pas pu être supprimé.");
+        return;
+    }
+
+    await chargerItemsHome(homeActif);
+}
+
+
+function afficherBadgesHome(destination) {
+
+    const sejourIds = new Set(
+        idsSejoursHome(destination).map(Number)
+    );
+
+    const badges = premieresFois.filter(
+        function(premiereFois) {
+            return sejourIds.has(Number(premiereFois.stay_id));
+        }
+    );
+
+    homeBadges.innerHTML = "";
+    homeBadgesSection.hidden = false;
+    homeBadgesVide.hidden = badges.length > 0;
+
+    badges.forEach(function(premiereFois) {
+        homeBadges.appendChild(
+            creerBadgePremiereFois(premiereFois)
+        );
+    });
+
+}
+
+
+function remplirSelectionBadgesHome() {
+
+    const disponibles = premieresFois.filter(
+        function(premiereFois) {
+            return premiereFois.stay_id === null;
+        }
+    );
+
+    homeBadgeSelect.innerHTML = "";
+
+    disponibles.forEach(function(premiereFois) {
+        const option = document.createElement("option");
+        option.value = premiereFois.id;
+        option.textContent = premiereFois.title;
+        homeBadgeSelect.appendChild(option);
+    });
+
+    ajouterHomeBadge.disabled = disponibles.length === 0;
+    ajouterHomeBadge.textContent = disponibles.length === 0
+        ? "Aucun badge disponible"
+        : "Débloquer un badge";
+}
+
+
+async function ouvrirFicheHome(destination) {
+
+    homeActif = destination;
+    fermerFormulaireHomeItem();
+    homeProfilForm.hidden = true;
+    modifierHome.hidden = false;
+    homePhotoMessage.textContent = "";
+
+    try {
+        await Promise.all([
+            chargerProfilHome(destination),
+            chargerPhotosHome(destination),
+            chargerItemsHome(destination),
+            chargerPremieresFois()
+        ]);
+
+        afficherBadgesHome(destination);
+        remplirSelectionBadgesHome();
+
+        if (!homeDialog.open) {
+            homeDialog.showModal();
+        }
+
+        homeDialog.scrollTop = 0;
+        document.body.classList.add("fiche-ouverte");
+
+    } catch (erreur) {
+        console.error("Ouverture du chez-nous impossible :", erreur);
+        window.alert("Impossible de charger cette page pour le moment.");
+    }
+
+}
+
+
+modifierHome.addEventListener("click", function() {
+    homeTaglineInput.value =
+        homeActif.homePage?.tagline ||
+        libelleHomeParDefaut(homeActif);
+    homeIntroductionInput.value =
+        homeActif.homePage?.introduction ?? "";
+    homeProfilForm.hidden = false;
+    modifierHome.hidden = true;
+    homeTaglineInput.focus();
+});
+
+
+annulerHomeProfil.addEventListener("click", function() {
+    homeProfilForm.hidden = true;
+    modifierHome.hidden = false;
+});
+
+
+homeProfilForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const donnees = {
+        city_id: homeActif.id,
+        tagline: homeTaglineInput.value.trim(),
+        introduction: homeIntroductionInput.value.trim() || null
+    };
+
+    const { data, error } = await supabaseClient
+        .from("home_pages")
+        .upsert(donnees, { onConflict: "city_id" })
+        .select("city_id, tagline, introduction, updated_at")
+        .single();
+
+    if (error) {
+        window.alert("La présentation n’a pas pu être enregistrée.");
+        return;
+    }
+
+    homeActif.homePage = data;
+    await chargerProfilHome(homeActif);
+    homeProfilForm.hidden = true;
+    modifierHome.hidden = false;
+    afficherHomesAccueil();
+});
+
+
+homeAjoutPhotos.addEventListener("change", async function() {
+
+    const fichiers = Array.from(homeAjoutPhotos.files ?? []).filter(
+        function(fichier) {
+            return fichier.type.startsWith("image/") &&
+                fichier.size <= 10 * 1024 * 1024;
+        }
+    );
+
+    homeAjoutPhotos.value = "";
+
+    if (fichiers.length === 0) {
+        return;
+    }
+
+    homePhotoMessage.textContent = "Envoi des photos…";
+
+    try {
+        const sejour = await obtenirSejourSupportHome(homeActif);
+        await envoyerPhotos(fichiers, sejour, homeActif);
+        await chargerPhotosHome(homeActif);
+        await chargerDestinationsDepuisSupabase();
+        homePhotoMessage.textContent =
+            `${fichiers.length} photo${fichiers.length > 1 ? "s ajoutées" : " ajoutée"}.`;
+    } catch (erreur) {
+        console.error("Ajout des photos impossible :", erreur);
+        homePhotoMessage.textContent = "L’envoi des photos a échoué.";
+    }
+});
+
+
+ajouterHomeItem.addEventListener("click", function() {
+    ouvrirFormulaireHomeItem();
+});
+
+annulerHomeItem.addEventListener("click", fermerFormulaireHomeItem);
+
+
+ajouterHomeBadge.addEventListener("click", function() {
+    homeBadgeForm.reset();
+    homeBadgeForm.hidden = false;
+    ajouterHomeBadge.hidden = true;
+});
+
+annulerHomeBadge.addEventListener("click", function() {
+    homeBadgeForm.hidden = true;
+    ajouterHomeBadge.hidden = false;
+});
+
+homeBadgeForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const premiereFois = premieresFois.find(
+        function(element) {
+            return String(element.id) === homeBadgeSelect.value;
+        }
+    );
+
+    if (!premiereFois) {
+        return;
+    }
+
+    try {
+        const sejour = await obtenirSejourSupportHome(homeActif);
+        await debloquerPremieresFois(
+            sejour.id,
+            [{
+                id: premiereFois.id,
+                title: premiereFois.title,
+                unlocked_on: homeBadgeDate.value || null
+            }]
+        );
+        afficherBadgesHome(homeActif);
+        remplirSelectionBadgesHome();
+        homeBadgeForm.hidden = true;
+        ajouterHomeBadge.hidden = false;
+    } catch (erreur) {
+        console.error("Déblocage du badge impossible :", erreur);
+        window.alert("Le badge n’a pas pu être débloqué.");
+    }
+});
+
+
+homeItemForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const id = homeItemId.value;
+    const donnees = {
+        city_id: homeActif.id,
+        item_type: homeItemType.value,
+        title: homeItemTitle.value.trim(),
+        content: homeItemContent.value.trim() || null,
+        happened_on: homeItemDate.value || null
+    };
+
+    if (!donnees.title) {
+        homeItemMessage.textContent = "Ajoutez un titre à ce fragment.";
+        return;
+    }
+
+    let requete;
+
+    if (id) {
+        requete = supabaseClient
+            .from("home_items")
+            .update(donnees)
+            .eq("id", id);
+    } else {
+        requete = supabaseClient
+            .from("home_items")
+            .insert(donnees);
+    }
+
+    const { error } = await requete;
+
+    if (error) {
+        homeItemMessage.textContent =
+            `Enregistrement impossible : ${error.message}`;
+        return;
+    }
+
+    fermerFormulaireHomeItem();
+    await chargerItemsHome(homeActif);
+});
+
+
+function fermerFicheHome() {
+    if (!homeDialog.open) {
+        return;
+    }
+    homeDialog.close();
+    homeActif = null;
+    document.body.classList.remove("fiche-ouverte");
+}
+
+fermerHome.addEventListener("click", fermerFicheHome);
+
+homeDialog.addEventListener("cancel", function(event) {
+    event.preventDefault();
+    fermerFicheHome();
+});
