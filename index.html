@@ -63,7 +63,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=homes-1"
+        href="style.css?v=ux-mobile-2"
     >
 </head>
 
@@ -1335,7 +1335,8 @@
                     <button
                         id="supprimer-ville"
                         class="supprimer-ville"
-                        type="button">
+                        type="button"
+                        aria-label="Supprimer cette ville">
                         Supprimer la ville
                     </button>
 
@@ -1741,9 +1742,24 @@
                 class="fiche-contenu fiche-edition"
                 hidden>
 
+                <div class="edition-introduction">
+                    <p class="souvenir-sur-titre">Édition du souvenir</p>
+                    <h3>Raconter ce séjour</h3>
+                    <p>Avancez à votre rythme : seuls les champs qui comptent pour vous ont besoin d’être remplis.</p>
+                </div>
+
+                <nav class="edition-nav" aria-label="Rubriques du souvenir">
+                    <button type="button" data-edition-cible="edition-dates" class="actif">Dates</button>
+                    <button type="button" data-edition-cible="edition-personnes">Nous deux</button>
+                    <button type="button" data-edition-cible="edition-ensemble">Ensemble</button>
+                    <button type="button" data-edition-cible="edition-premieres-fois">Premières fois</button>
+                    <button type="button" data-edition-cible="edition-photos">Photos</button>
+                    <button type="button" data-edition-cible="edition-audio">Audio</button>
+                </nav>
+
                 <!-- DATES -->
 
-                <section class="fiche-dates">
+                <section id="edition-dates" class="fiche-dates edition-section">
 
                     <h3>Les dates du séjour</h3>
 
@@ -1777,7 +1793,7 @@
 
                 <!-- AMINE ET MAÉNA -->
 
-                <section class="fiche-rubrique">
+                <section id="edition-personnes" class="fiche-rubrique edition-section">
 
                     <h3>Nos souvenirs personnels</h3>
 
@@ -1789,19 +1805,20 @@
 
                             <label class="souvenir-champ">
                                 Lieu préféré
-                                <input id="amine-lieu" type="text">
+                                <input id="amine-lieu" type="text" placeholder="Un lieu, une rue, un point de vue…">
                             </label>
 
                             <label class="souvenir-champ">
                                 Repas préféré
-                                <input id="amine-repas" type="text">
+                                <input id="amine-repas" type="text" placeholder="Le plat ou l’adresse qui reste en tête">
                             </label>
 
                             <label class="souvenir-champ">
                                 Ma phrase
                                 <textarea
                                     id="amine-phrase"
-                                    rows="3">
+                                    rows="3"
+                                    placeholder="Une sensation, un moment, une petite phrase…">
                                 </textarea>
                             </label>
 
@@ -1825,19 +1842,20 @@
 
                             <label class="souvenir-champ">
                                 Lieu préféré
-                                <input id="maena-lieu" type="text">
+                                <input id="maena-lieu" type="text" placeholder="Un lieu, une rue, un point de vue…">
                             </label>
 
                             <label class="souvenir-champ">
                                 Repas préféré
-                                <input id="maena-repas" type="text">
+                                <input id="maena-repas" type="text" placeholder="Le plat ou l’adresse qui reste en tête">
                             </label>
 
                             <label class="souvenir-champ">
                                 Ma phrase
                                 <textarea
                                     id="maena-phrase"
-                                    rows="3">
+                                    rows="3"
+                                    placeholder="Une sensation, un moment, une petite phrase…">
                                 </textarea>
                             </label>
 
@@ -1861,7 +1879,15 @@
 
                 <!-- SOUVENIRS COMMUNS -->
 
-                <section class="fiche-rubrique">
+                <section id="edition-ensemble" class="fiche-rubrique edition-section edition-ensemble">
+
+                    <div class="rubrique-titre edition-rubrique-titre">
+                        <span class="rubrique-numero">03</span>
+                        <div>
+                            <p class="souvenir-sur-titre">Ce que l’on garde ensemble</p>
+                            <h3>Notre souvenir commun</h3>
+                        </div>
+                    </div>
 
                     <label class="souvenir-champ">
 
@@ -1869,14 +1895,15 @@
 
                         <textarea
                             id="fiche-phrase-commune"
-                            rows="3">
+                            rows="3"
+                            placeholder="La phrase qui résume ce séjour…">
                         </textarea>
 
                     </label>
 
                 </section>
 
-                <section class="fiche-rubrique">
+                <section class="fiche-rubrique edition-section edition-musique">
 
                     <label class="souvenir-champ">
 
@@ -1893,7 +1920,7 @@
 
                 <!-- PREMIÈRES FOIS DU SÉJOUR -->
 
-                <section class="fiche-rubrique">
+                <section id="edition-premieres-fois" class="fiche-rubrique edition-section">
 
                     <div class="rubrique-titre">
 
@@ -1947,7 +1974,7 @@
 
                 <!-- AJOUT DES PHOTOS -->
 
-                <section class="fiche-rubrique">
+                <section id="edition-photos" class="fiche-rubrique edition-section">
 
                     <div class="rubrique-titre">
 
@@ -2015,7 +2042,7 @@
 
                 <!-- AJOUT DU VOCAL -->
 
-                <section class="fiche-rubrique">
+                <section id="edition-audio" class="fiche-rubrique edition-section">
 
                     <div class="rubrique-titre">
 
@@ -2100,12 +2127,12 @@
 
                 <!-- BOUTONS -->
 
-                <div class="fiche-actions">
+                <div id="edition-actions" class="fiche-actions">
 
                     <button
                         class="enregistrer-souvenirs"
                         type="submit">
-                        Enregistrer
+                        Enregistrer le souvenir
                     </button>
 
                     <button
@@ -2122,8 +2149,8 @@
 
                 </div>
 
-                <p class="fiche-secondaire">
-                    Sauvegarde sur ce navigateur uniquement pour le moment.
+                <p class="fiche-secondaire edition-synchronisation">
+                    Les modifications seront synchronisées dans AMOR.
                 </p>
 
             </form>
@@ -2189,7 +2216,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
-    <script src="app.js?v=homes-1"></script>
+    <script src="app.js?v=ux-mobile-2"></script>
 
 </body>
 

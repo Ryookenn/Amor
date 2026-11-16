@@ -15,6 +15,641 @@
     --border: #ddcfca;
 }
 
+/* Interaction tactile prioritaire, placée en fin de cascade. */
+button:active:not(:disabled),
+.ajouter-photos:active,
+.ajouter-audio:active {
+    transform: translateY(2px) scale(0.975) !important;
+}
+
+
+/* =========================================================
+   AMOR — EXPÉRIENCE MOBILE PREMIUM
+   Surcouche visuelle sans modification de l'identité
+========================================================= */
+
+:root {
+    --wine-soft: #a84a66;
+    --wine-wash: rgba(127, 38, 62, 0.08);
+    --wine-halo: rgba(127, 38, 62, 0.18);
+    --surface-glass: rgba(255, 250, 247, 0.92);
+    --shadow-soft: 0 12px 36px rgba(70, 23, 39, 0.09);
+    --shadow-card: 0 8px 24px rgba(70, 23, 39, 0.07);
+}
+
+button,
+[role="button"],
+.ajouter-photos,
+.ajouter-audio {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button,
+.ajouter-photos,
+.ajouter-audio {
+    transition:
+        transform 150ms cubic-bezier(.2, .8, .2, 1),
+        box-shadow 180ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        opacity 180ms ease;
+}
+
+button:active:not(:disabled),
+.ajouter-photos:active,
+.ajouter-audio:active {
+    transform: translateY(2px) scale(0.975);
+}
+
+button:focus-visible,
+.ajouter-photos:focus-visible,
+.ajouter-audio:focus-visible {
+    outline: 3px solid var(--wine-halo);
+    outline-offset: 3px;
+}
+
+.edition-introduction {
+    margin-bottom: 18px;
+    padding: 24px 26px;
+    overflow: hidden;
+    position: relative;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(211, 143, 153, 0.28), transparent 42%),
+        linear-gradient(135deg, var(--wine-dark), var(--wine));
+    color: white;
+    border-radius: 22px;
+    box-shadow: 0 16px 36px rgba(70, 23, 39, 0.18);
+}
+
+.edition-introduction::after {
+    content: "♥";
+    position: absolute;
+    right: 20px;
+    bottom: -24px;
+    color: rgba(255, 255, 255, 0.09);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 7rem;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.edition-introduction .souvenir-sur-titre {
+    color: #f0c9d2;
+}
+
+.edition-introduction h3 {
+    margin: 0 0 8px;
+    color: white;
+    font-size: clamp(1.75rem, 4vw, 2.3rem);
+}
+
+.edition-introduction > p:last-child {
+    max-width: 520px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.93rem;
+}
+
+.edition-nav {
+    display: flex;
+    gap: 8px;
+    margin: 0 -4px 8px;
+    padding: 6px 4px 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+}
+
+.edition-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.edition-nav button {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 0 15px;
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    box-shadow: 0 3px 12px rgba(70, 23, 39, 0.04);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.edition-nav button.actif {
+    background: var(--wine);
+    color: white;
+    border-color: var(--wine);
+    box-shadow: 0 7px 18px var(--wine-halo);
+}
+
+.fiche-edition .edition-section {
+    scroll-margin-top: 170px;
+    margin-top: 18px;
+    padding: 25px;
+    background: var(--surface);
+    border: 1px solid rgba(127, 38, 62, 0.11);
+    border-radius: 22px;
+    box-shadow: var(--shadow-card);
+}
+
+.fiche-edition .fiche-dates.edition-section {
+    margin-top: 14px;
+}
+
+.fiche-edition .edition-musique {
+    margin-top: 12px;
+}
+
+.fiche-edition .edition-section > h3,
+.fiche-edition .edition-personne h4 {
+    color: var(--wine-dark);
+}
+
+.fiche-edition .rubrique-titre {
+    margin-bottom: 20px;
+    border-bottom-color: rgba(127, 38, 62, 0.12);
+}
+
+.fiche-edition .rubrique-numero {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: var(--wine-wash);
+    border-radius: 50%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.fiche-edition .reponse-personne.edition-personne {
+    position: relative;
+    padding: 24px;
+    overflow: hidden;
+    border-color: rgba(127, 38, 62, 0.14);
+    border-radius: 19px;
+    box-shadow: none;
+}
+
+.fiche-edition .reponse-personne.edition-personne::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(var(--wine-soft), var(--wine));
+}
+
+.fiche-edition .edition-personne h4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+    font-size: 1.7rem;
+}
+
+.fiche-edition .edition-personne h4::before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    background: var(--wine);
+    border-radius: 50%;
+    box-shadow: 0 0 0 6px var(--wine-wash);
+}
+
+.fiche-edition .souvenir-champ {
+    gap: 9px;
+    margin-bottom: 18px;
+    color: var(--text);
+    font-size: 0.83rem;
+    font-weight: 700;
+    letter-spacing: 0.015em;
+}
+
+.fiche-edition .souvenir-champ:last-child {
+    margin-bottom: 0;
+}
+
+.fiche-edition .souvenir-champ input,
+.fiche-edition .souvenir-champ textarea {
+    min-height: 52px;
+    padding: 14px 15px;
+    background: #fffdfb;
+    color: var(--text);
+    border: 1px solid #decfca;
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+    line-height: 1.45;
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        background-color 180ms ease;
+}
+
+.fiche-edition .souvenir-champ textarea {
+    min-height: 108px;
+}
+
+.fiche-edition .souvenir-champ input::placeholder,
+.fiche-edition .souvenir-champ textarea::placeholder {
+    color: #aa969b;
+    opacity: 1;
+}
+
+.fiche-edition .souvenir-champ input:focus,
+.fiche-edition .souvenir-champ textarea:focus {
+    background: white;
+    border-color: var(--wine-soft);
+    outline: none;
+    box-shadow: 0 0 0 4px var(--wine-wash), 0 8px 22px rgba(70, 23, 39, 0.06);
+}
+
+.fiche-edition .ajouter-photos,
+.fiche-edition .ajouter-audio {
+    min-height: 96px;
+    background:
+        linear-gradient(var(--surface), var(--surface)) padding-box,
+        linear-gradient(135deg, rgba(127, 38, 62, 0.42), rgba(211, 143, 153, 0.25)) border-box;
+    border: 1px solid transparent;
+    border-radius: 18px;
+    box-shadow: 0 8px 22px rgba(70, 23, 39, 0.06);
+}
+
+.fiche-edition .ajouter-photos:hover,
+.fiche-edition .ajouter-audio:hover {
+    background:
+        linear-gradient(#fff7f4, #fff7f4) padding-box,
+        linear-gradient(135deg, var(--wine), var(--wine-soft)) border-box;
+    box-shadow: 0 12px 26px rgba(70, 23, 39, 0.1);
+}
+
+.fiche-edition .ajouter-photos-icone,
+.fiche-edition .ajouter-audio-icone {
+    background: var(--wine);
+    color: white;
+    box-shadow: 0 7px 18px var(--wine-halo);
+}
+
+.fiche-edition .media-vide {
+    border: 1px dashed rgba(127, 38, 62, 0.2);
+    border-radius: 16px;
+}
+
+.fiche-edition .fiche-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin: 26px -28px -28px;
+    padding: 15px 28px max(15px, env(safe-area-inset-bottom));
+    background: var(--surface-glass);
+    border-top: 1px solid rgba(127, 38, 62, 0.12);
+    box-shadow: 0 -14px 34px rgba(70, 23, 39, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.fiche-edition .enregistrer-souvenirs {
+    min-height: 50px;
+    padding: 0 24px;
+    background: linear-gradient(135deg, var(--wine), var(--wine-dark));
+    border-radius: 999px;
+    box-shadow: 0 10px 24px var(--wine-halo);
+    font-weight: 700;
+}
+
+.fiche-edition .enregistrer-souvenirs:hover {
+    box-shadow: 0 13px 30px rgba(70, 23, 39, 0.26);
+}
+
+.fiche-edition .annuler-modification {
+    min-height: 48px;
+    padding: 0 20px;
+    border-radius: 999px;
+}
+
+.edition-synchronisation {
+    margin: 18px 0 0;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+
+    .souvenir-dialog {
+        background: #f7f1ed;
+    }
+
+    .souvenir-dialog .fiche-header {
+        min-height: 84px;
+        padding:
+            max(14px, env(safe-area-inset-top))
+            16px
+            14px;
+        background:
+            radial-gradient(circle at 8% 0%, rgba(211, 143, 153, 0.25), transparent 42%),
+            linear-gradient(135deg, var(--wine-dark), var(--wine));
+        color: white;
+        border: 0;
+        box-shadow: 0 8px 22px rgba(70, 23, 39, 0.18);
+    }
+
+    .souvenir-dialog .fiche-region {
+        margin-bottom: 4px;
+        color: #eec9d1;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .souvenir-dialog .fiche-header h2 {
+        color: white;
+        font-size: clamp(1.65rem, 8vw, 2.15rem);
+        line-height: 1.02;
+    }
+
+    .souvenir-dialog .fiche-header-actions {
+        gap: 6px;
+    }
+
+    .souvenir-dialog .modifier-fiche {
+        min-height: 42px;
+        padding: 0 14px;
+        background: white;
+        color: var(--wine);
+        border-color: white;
+        box-shadow: 0 6px 18px rgba(20, 5, 10, 0.2);
+        font-weight: 700;
+    }
+
+    .souvenir-dialog .fermer-fiche {
+        width: 42px;
+        height: 42px;
+        background: rgba(255, 255, 255, 0.12);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.34);
+        line-height: 1;
+    }
+
+    .souvenir-dialog .supprimer-ville {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .souvenir-dialog .navigation-sejours {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 12px 16px;
+        background: rgba(255, 250, 247, 0.96);
+        border-bottom-color: rgba(127, 38, 62, 0.11);
+        box-shadow: 0 5px 18px rgba(70, 23, 39, 0.05);
+    }
+
+    .souvenir-dialog .navigation-sejours-principale {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .souvenir-dialog .indicateur-sejour {
+        justify-content: center;
+        min-width: 0;
+    }
+
+    .souvenir-dialog .bouton-navigation-sejour {
+        width: 42px;
+        height: 42px;
+        box-shadow: 0 4px 14px rgba(70, 23, 39, 0.06);
+    }
+
+    .souvenir-dialog .actions-sejours {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .souvenir-dialog .ajouter-sejour,
+    .souvenir-dialog .supprimer-sejour {
+        justify-content: center;
+        min-height: 42px;
+    }
+
+    .souvenir-dialog .ajouter-sejour {
+        background: var(--wine-wash);
+        font-weight: 700;
+    }
+
+    .souvenir-dialog .fiche-contenu {
+        padding: 16px 16px calc(22px + env(safe-area-inset-bottom));
+    }
+
+    .souvenir-dialog #souvenir-view .souvenir-introduction,
+    .souvenir-dialog #souvenir-view .fiche-rubrique {
+        margin-top: 14px;
+        padding: 20px;
+        background: var(--surface);
+        border: 1px solid rgba(127, 38, 62, 0.1);
+        border-radius: 20px;
+        box-shadow: var(--shadow-card);
+    }
+
+    .souvenir-dialog #souvenir-view .souvenir-introduction {
+        margin-top: 0;
+        background:
+            radial-gradient(circle at 100% 0%, rgba(211, 143, 153, 0.2), transparent 48%),
+            var(--surface);
+    }
+
+    .souvenir-dialog #souvenir-view .rubrique-titre {
+        margin-bottom: 18px;
+        padding-bottom: 13px;
+    }
+
+    .souvenir-dialog #souvenir-view .rubrique-titre h3 {
+        font-size: 1.38rem;
+    }
+
+    .souvenir-dialog #souvenir-view .reponses-duo {
+        gap: 12px;
+    }
+
+    .souvenir-dialog #souvenir-view .reponse-personne {
+        padding: 19px;
+        background: #fffdfb;
+        border-color: rgba(127, 38, 62, 0.12);
+        border-radius: 17px;
+    }
+
+    .souvenir-dialog #souvenir-view .reponse-personne h4 {
+        margin-bottom: 18px;
+    }
+
+    .souvenir-dialog #souvenir-view .souvenir-reponse {
+        padding: 15px 0;
+    }
+
+    .souvenir-dialog #souvenir-view .phrase-commune {
+        padding: 18px 19px;
+        background: #fff7f4;
+        border-radius: 4px 14px 14px 4px;
+        font-size: 1.12rem;
+    }
+
+    .souvenir-dialog #souvenir-view .galerie-photos {
+        gap: 8px;
+    }
+
+    .souvenir-dialog #souvenir-view .photo-souvenir {
+        border-radius: 14px;
+        box-shadow: 0 6px 16px rgba(70, 23, 39, 0.1);
+    }
+
+    .fiche-edition {
+        background: #f7f1ed;
+    }
+
+    .edition-introduction {
+        margin-bottom: 12px;
+        padding: 22px 20px;
+        border-radius: 19px;
+    }
+
+    .edition-introduction h3 {
+        font-size: 1.75rem;
+    }
+
+    .edition-introduction > p:last-child {
+        font-size: 0.86rem;
+        line-height: 1.55;
+    }
+
+    .edition-nav {
+        position: sticky;
+        top: 82px;
+        z-index: 4;
+        margin: 0 -16px;
+        padding: 10px 16px 12px;
+        background: rgba(247, 241, 237, 0.94);
+        border-bottom: 1px solid rgba(127, 38, 62, 0.08);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+    }
+
+    .edition-nav button {
+        min-height: 40px;
+        padding-inline: 16px;
+    }
+
+    .fiche-edition .edition-section {
+        scroll-margin-top: 145px;
+        margin-top: 12px;
+        padding: 19px;
+        border-radius: 19px;
+    }
+
+    .fiche-edition .edition-section > h3,
+    .fiche-edition .edition-rubrique-titre h3 {
+        font-size: 1.4rem;
+    }
+
+    .fiche-edition .reponses-duo {
+        gap: 12px;
+    }
+
+    .fiche-edition .reponse-personne.edition-personne {
+        padding: 20px 17px 20px 20px;
+        border-radius: 17px;
+    }
+
+    .fiche-edition .edition-personne h4 {
+        font-size: 1.55rem;
+    }
+
+    .fiche-edition .souvenir-champ {
+        margin-bottom: 16px;
+    }
+
+    .fiche-edition .souvenir-champ input,
+    .fiche-edition .souvenir-champ textarea {
+        min-height: 54px;
+        padding: 15px;
+        border-radius: 14px;
+        font-size: 16px;
+    }
+
+    .fiche-edition .souvenir-champ textarea {
+        min-height: 112px;
+    }
+
+    .fiche-edition .ajouter-photos,
+    .fiche-edition .ajouter-audio {
+        min-height: 92px;
+        padding: 16px;
+        border-radius: 17px;
+    }
+
+    .fiche-edition .fiche-actions {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 9px;
+        margin: 20px -16px calc(-22px - env(safe-area-inset-bottom));
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    }
+
+    .fiche-edition .enregistrer-souvenirs {
+        width: 100%;
+        min-height: 52px;
+        padding-inline: 18px;
+    }
+
+    .fiche-edition .annuler-modification {
+        min-height: 52px;
+        padding-inline: 16px;
+        background: var(--surface);
+    }
+
+    .fiche-edition #souvenir-message {
+        grid-column: 1 / -1;
+        text-align: center;
+    }
+
+    .edition-synchronisation {
+        padding-bottom: 78px;
+    }
+
+    .bouton-compte,
+    .bouton-deconnexion,
+    .ouvrir-ajout-ville,
+    .ouvrir-premieres-fois,
+    .home-bouton,
+    .compte-validation,
+    .auth-submit {
+        box-shadow: 0 6px 18px rgba(70, 23, 39, 0.1);
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+    button,
+    .ajouter-photos,
+    .ajouter-audio {
+        transition: none;
+    }
+}
+
 
 /* =========================
    RÉGLAGES GÉNÉRAUX
@@ -5030,6 +5665,41 @@ textarea {
         flex: 1;
         flex-direction: column;
         gap: 3px;
+    }
+
+}
+
+
+/* Correctifs placés en fin de cascade pour les actions tactiles. */
+
+button:active:not(:disabled),
+.ajouter-photos:active,
+.ajouter-audio:active {
+    transform: translateY(2px) scale(0.975) !important;
+}
+
+@media (max-width: 600px) {
+
+    .souvenir-dialog .supprimer-ville {
+        position: static;
+        width: 46px;
+        height: 42px;
+        padding: 0;
+        overflow: visible;
+        clip: auto;
+        background: rgba(255, 255, 255, 0.1);
+        color: #f4dce2;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 999px;
+        font-size: 0;
+        white-space: normal;
+    }
+
+    .souvenir-dialog .supprimer-ville::before {
+        content: "Suppr.";
+        font-size: 0.64rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
     }
 
 }

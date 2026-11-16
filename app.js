@@ -3541,6 +3541,10 @@ function afficherModeConsultation() {
     modeEdition = false;
     formulaireModifie = false;
 
+    souvenirDialog.classList.remove(
+        "mode-edition"
+    );
+
     souvenirView.hidden = false;
     souvenirForm.hidden = true;
 
@@ -3558,6 +3562,10 @@ function afficherModeEdition() {
 
     modeEdition = true;
     formulaireModifie = false;
+
+    souvenirDialog.classList.add(
+        "mode-edition"
+    );
 
     remplirFormulaire(souvenirsActifs);
 
@@ -8322,3 +8330,155 @@ homeDialog.addEventListener("cancel", function(event) {
     event.preventDefault();
     fermerFicheHome();
 });
+
+
+// =========================
+// NAVIGATION MOBILE DE LA FICHE
+// =========================
+
+const boutonsNavigationEdition =
+    Array.from(
+        document.querySelectorAll(
+            "[data-edition-cible]"
+        )
+    );
+
+
+function activerBoutonNavigationEdition(
+    boutonActif
+) {
+
+    boutonsNavigationEdition.forEach(
+        function(bouton) {
+
+            const estActif =
+                bouton === boutonActif;
+
+            bouton.classList.toggle(
+                "actif",
+                estActif
+            );
+
+            bouton.setAttribute(
+                "aria-current",
+                estActif ? "true" : "false"
+            );
+
+        }
+    );
+
+}
+
+
+boutonsNavigationEdition.forEach(
+    function(bouton) {
+
+        bouton.addEventListener(
+            "click",
+            function() {
+
+                const cible =
+                    document.getElementById(
+                        bouton.dataset.editionCible
+                    );
+
+                if (!cible) {
+                    return;
+                }
+
+                activerBoutonNavigationEdition(
+                    bouton
+                );
+
+                cible.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            }
+        );
+
+    }
+);
+
+
+const sectionsEdition =
+    Array.from(
+        document.querySelectorAll(
+            ".fiche-edition .edition-section[id]"
+        )
+    );
+
+
+let animationNavigationEdition = null;
+
+
+souvenirDialog.addEventListener(
+    "scroll",
+    function() {
+
+        if (
+            !modeEdition ||
+            animationNavigationEdition
+        ) {
+            return;
+        }
+
+        animationNavigationEdition =
+            requestAnimationFrame(
+                function() {
+
+                    animationNavigationEdition = null;
+
+                    const repere = 190;
+                    let sectionCourante =
+                        sectionsEdition[0];
+
+                    sectionsEdition.forEach(
+                        function(section) {
+
+                            if (
+                                section.getBoundingClientRect()
+                                    .top <= repere
+                            ) {
+                                sectionCourante = section;
+                            }
+
+                        }
+                    );
+
+                    if (!sectionCourante) {
+                        return;
+                    }
+
+                    const bouton =
+                        boutonsNavigationEdition.find(
+                            function(element) {
+
+                                return (
+                                    element.dataset
+                                        .editionCible ===
+                                    sectionCourante.id
+                                );
+
+                            }
+                        );
+
+                    if (bouton) {
+                        activerBoutonNavigationEdition(
+                            bouton
+                        );
+
+                        bouton.parentElement.scrollTo({
+                            left:
+                                bouton.offsetLeft - 16,
+                            behavior: "smooth"
+                        });
+                    }
+
+                }
+            );
+
+    },
+    { passive: true }
+);

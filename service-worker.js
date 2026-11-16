@@ -3,14 +3,14 @@
 // =========================
 
 const CACHE_NAME =
-    "amor-static-v1";
+    "amor-static-v2-mobile-premium";
 
 
 const FICHIERS_ESSENTIELS = [
     "./",
     "./index.html",
-    "./style.css",
-    "./app.js",
+    "./style.css?v=ux-mobile-2",
+    "./app.js?v=ux-mobile-2",
     "./config.js",
     "./manifest.webmanifest",
     "./assets/icons/amor-favicon-32.png",
