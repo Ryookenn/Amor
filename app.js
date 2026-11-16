@@ -148,6 +148,8 @@ async function chargerDestinationsDepuisSupabase() {
             "Impossible de charger les villes depuis Supabase."
         );
 
+        document.dispatchEvent(new CustomEvent("amor:data-error"));
+
         return;
 
     }
@@ -390,6 +392,7 @@ async function chargerDestinationsDepuisSupabase() {
 
     afficherDestinations();
     afficherHomesAccueil();
+    document.dispatchEvent(new CustomEvent("amor:data-ready"));
     actualiserStatistiques();
 
 }
@@ -2908,6 +2911,8 @@ async function chargerPhotos(souvenirs) {
             erreurMedias
         );
 
+        document.dispatchEvent(new CustomEvent("amor:media-error", {detail:{audio:false, stayId:sejourIdDemande}}));
+
         return;
 
     }
@@ -2946,6 +2951,8 @@ async function chargerPhotos(souvenirs) {
             "Création des liens impossible :",
             erreurLiens
         );
+
+        document.dispatchEvent(new CustomEvent("amor:media-error", {detail:{audio:false, stayId:sejourIdDemande}}));
 
         return;
 
@@ -3313,6 +3320,8 @@ async function chargerAudio(souvenirs) {
             error
         );
 
+        document.dispatchEvent(new CustomEvent("amor:media-error", {detail:{audio:true, stayId:sejourIdDemande}}));
+
         return;
 
     }
@@ -3345,6 +3354,8 @@ async function chargerAudio(souvenirs) {
             "Ouverture du vocal impossible :",
             erreurLien
         );
+
+        document.dispatchEvent(new CustomEvent("amor:media-error", {detail:{audio:true, stayId:sejourIdDemande}}));
 
         return;
 
@@ -6795,6 +6806,8 @@ boutonOuvrirPremieresFois.addEventListener(
             listePremieresFoisRealisees.textContent =
                 "";
 
+            document.dispatchEvent(new CustomEvent("amor:first-times-error"));
+
         }
 
     }
@@ -8195,6 +8208,7 @@ homeProfilForm.addEventListener("submit", async function(event) {
     homeProfilForm.hidden = true;
     modifierHome.hidden = false;
     afficherHomesAccueil();
+    document.dispatchEvent(new CustomEvent("amor:home-saved", {detail:{type:"profile"}}));
 });
 
 
@@ -8323,6 +8337,7 @@ homeItemForm.addEventListener("submit", async function(event) {
 
     fermerFormulaireHomeItem();
     await chargerItemsHome(homeActif);
+    document.dispatchEvent(new CustomEvent("amor:home-saved", {detail:{type:"item"}}));
 });
 
 

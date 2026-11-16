@@ -113,18 +113,22 @@
         const image = cover.querySelector('img');
         function update() {
             const first = source.querySelector('img');
-            const url = first?.getAttribute('src');
+            const preference = window.amorCoverSource?.(dialog.id);
+            const url = preference?.url || first?.getAttribute('src');
+            image.style.objectPosition = `${preference?.x ?? 50}% ${preference?.y ?? 50}%`;
             cover.hidden = !url;
             if (url && image.getAttribute('src') !== url) image.src = url;
             cover.querySelector('h3').textContent = title.textContent;
             cover.querySelector('p').textContent = subtitle.textContent;
             dialog.dataset.city = title.textContent.trim().toLowerCase();
         }
-        image.addEventListener('error', () => { cover.hidden = true; });
+        image.addEventListener('error', () => { cover.classList.add('amor-cover-error'); });
+        image.addEventListener('load', () => { cover.classList.remove('amor-cover-error'); });
         new MutationObserver(update).observe(source, { childList: true, subtree: true });
         new MutationObserver(update).observe(title, { childList: true, subtree: true });
         new MutationObserver(update).observe(subtitle, { childList: true, subtree: true });
         update();
+        document.addEventListener('amor:refresh-covers', update);
     }
     makeCover($('#souvenir-dialog'), $('#galerie-photos'), $('#fiche-ville'), $('#vue-dates'));
     makeCover($('#home-dialog'), $('#home-galerie'), $('#home-ville'), $('#home-tagline'));
@@ -187,6 +191,8 @@
         lastBadge = Date.now();
         announce('Une nouvelle première fois dans notre histoire.', true);
     });
+    document.addEventListener('amor:moment-saved', () => announce('Ce petit moment est enregistré.'));
+    document.addEventListener('amor:home-saved', () => announce('Votre page est enregistrée.'));
 
     // Champs souples, sans modifier leur valeur ou les règles de saisie.
     function grow(textarea) {
@@ -212,19 +218,5 @@
         }
     }).observe(edition, { attributes: true, attributeFilter: ['hidden'] });
 
-    // Balayage de la visionneuse : les contrôles boutons restent accessibles.
-    let start = null;
-    const viewer = $('#visionneuse');
-    viewer.addEventListener('touchstart', event => {
-        start = event.touches.length === 1 ? {x: event.touches[0].clientX, y: event.touches[0].clientY} : null;
-    }, { passive: true });
-    viewer.addEventListener('touchend', event => {
-        if (!start || !event.changedTouches.length) return;
-        const dx = event.changedTouches[0].clientX - start.x;
-        const dy = event.changedTouches[0].clientY - start.y;
-        if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-            $(dx < 0 ? '#photo-suivante' : '#photo-precedente').click();
-        }
-        start = null;
-    }, { passive: true });
+    // Le carrousel tactile continu est géré par moments.js en V4.
 })();
