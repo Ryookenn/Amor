@@ -3,14 +3,16 @@
 // =========================
 
 const CACHE_NAME =
-    "amor-static-v2-mobile-premium";
+    "amor-static-experience-v3";
 
 
 const FICHIERS_ESSENTIELS = [
     "./",
     "./index.html",
     "./style.css?v=ux-mobile-2",
-    "./app.js?v=ux-mobile-2",
+    "./app.js?v=experience-3",
+    "./experience.css?v=3",
+    "./experience.js?v=3",
     "./config.js",
     "./manifest.webmanifest",
     "./assets/icons/amor-favicon-32.png",
@@ -64,6 +66,7 @@ self.addEventListener(
                             .filter(function(cacheName) {
 
                                 return (
+                                    cacheName.startsWith("amor-static-") &&
                                     cacheName !==
                                     CACHE_NAME
                                 );

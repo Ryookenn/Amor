@@ -4034,6 +4034,10 @@ souvenirForm.addEventListener(
         };
 
 
+        const boutonSauvegarde = souvenirForm.querySelector('[type="submit"]');
+        if (boutonSauvegarde.disabled) return;
+        boutonSauvegarde.disabled = true;
+
         souvenirMessage.textContent =
             "Enregistrement en cours…";
 
@@ -4117,6 +4121,8 @@ souvenirForm.addEventListener(
 
             afficherModeConsultation();
 
+            document.dispatchEvent(new CustomEvent("amor:saved"));
+
         } catch (erreur) {
 
             console.error(
@@ -4127,6 +4133,10 @@ souvenirForm.addEventListener(
             souvenirMessage.textContent =
                 "La sauvegarde en ligne a échoué. " +
                 "Garde la fiche ouverte et réessaie.";
+
+        } finally {
+
+            boutonSauvegarde.disabled = false;
 
         }
 
@@ -6349,6 +6359,7 @@ async function debloquerPremieresFois(
 
 
     await chargerPremieresFois();
+    document.dispatchEvent(new CustomEvent("amor:badge"));
 
 }
 
