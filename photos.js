@@ -59,15 +59,16 @@
         galeriePhotos.replaceChildren();mediasPhotosActifs=[];photosAffichees=[];photosVides.hidden=false;photosExistantesEdition.replaceChildren();
         if(!stay.id)return;
         try{
-            const {data,error}=await supabaseClient.from('stay_media').select('id,stay_id,storage_path,thumb_path,display_path,original_name,original_kept').eq('stay_id',stay.id).eq('media_type','photo').order('created_at');
+            const {data,error}=await supabaseClient.from('stay_media').select('id,stay_id,storage_path,thumb_path,display_path,original_name,original_kept,caption,sort_order,in_mosaic,revision,upload_key').eq('stay_id',stay.id).eq('media_type','photo').order('sort_order').order('created_at');
             if(error)throw error;
             const links=await signed(data);
             if(ticket!==stayRequest||String(souvenirsActifs.id)!==String(stay.id))return;
             mediasPhotosActifs=hydrate(data,links);
-            photosAffichees=mediasPhotosActifs.map(m=>({url:m.url,texteAlternatif:m.original_name||'Notre photo'}));
+            photosAffichees=mediasPhotosActifs.map(m=>({url:m.url,texteAlternatif:m.caption||m.original_name||'Notre photo'}));
             mediasPhotosActifs.forEach((m,i)=>{
                 const photo=creerElementPhoto(m.thumbUrl,m.original_name||`Photo ${i+1}`,()=>ouvrirVisionneuse(i));
                 photo.dataset.mediaId=m.id;galeriePhotos.append(photo);
+                photo.dataset.mosaic=String(m.in_mosaic!==false);
             });
             photosVides.hidden=mediasPhotosActifs.length>0;afficherPhotosEdition();
             document.dispatchEvent(new CustomEvent('amor:photos-ready'));
@@ -77,13 +78,14 @@
         const ticket=++homeRequest;
         homeGalerie.replaceChildren();homeMediasActifs=[];photosAffichees=[];homeGalerieVide.hidden=false;
         const ids=idsSejoursHome(destination);if(!ids.length)return;
-        const {data,error}=await supabaseClient.from('stay_media').select('id,stay_id,storage_path,thumb_path,display_path,original_name,original_kept,created_at').in('stay_id',ids).eq('media_type','photo').order('created_at');
+        const {data,error}=await supabaseClient.from('stay_media').select('id,stay_id,storage_path,thumb_path,display_path,original_name,original_kept,created_at,caption,sort_order,in_mosaic,revision,upload_key').in('stay_id',ids).eq('media_type','photo').order('sort_order').order('created_at');
         if(error)throw error;
         const links=await signed(data);if(ticket!==homeRequest||homeActif?.id!==destination.id)return;
         homeMediasActifs=hydrate(data,links);
-        photosAffichees=homeMediasActifs.map(m=>({url:m.url,texteAlternatif:m.original_name||'Notre photo'}));
+        photosAffichees=homeMediasActifs.map(m=>({url:m.url,texteAlternatif:m.caption||m.original_name||'Notre photo'}));
         homeMediasActifs.forEach((m,i)=>{
             const card=document.createElement('div');card.className='home-photo';card.dataset.mediaId=m.id;
+            card.classList.toggle('v6-hidden-mosaic',m.in_mosaic===false);
             const open=document.createElement('button');open.type='button';open.className='home-photo-ouvrir';open.setAttribute('aria-label','Agrandir cette photo');
             const image=document.createElement('img');image.src=m.thumbUrl;image.alt=m.original_name||'';image.loading='lazy';open.append(image);open.onclick=()=>ouvrirVisionneuse(i);
             const remove=document.createElement('button');remove.type='button';remove.className='home-photo-supprimer';remove.textContent='×';remove.setAttribute('aria-label','Mettre cette photo à la corbeille');remove.onclick=()=>supprimerPhotoHome(m,remove);

@@ -2367,9 +2367,7 @@ ajoutPhotos.addEventListener(
                 function(fichier) {
 
                     return (
-                        fichier.type.startsWith(
-                            "image/"
-                        ) &&
+                        (fichier.type.startsWith("image/") || /\.hei[cf]$/i.test(fichier.name)) &&
                         fichier.size <=
                             10 * 1024 * 1024
                     );
@@ -3939,7 +3937,7 @@ souvenirForm.addEventListener(
         }
 
         const premieresFoisADebloquer =
-            obtenirPremieresFoisSelectionnees();
+            obtenirPremieresFoisSelectionnees().filter(selection=>premieresFois.find(p=>String(p.id)===String(selection.id))?.stay_id==null);
 
 
         if (
@@ -3981,6 +3979,8 @@ souvenirForm.addEventListener(
         }
 
         const nouveauxSouvenirs = {
+
+            revision: souvenirsActifs.revision,
 
             id:
                 souvenirsActifs.id ?? null,
@@ -8197,7 +8197,7 @@ homeAjoutPhotos.addEventListener("change", async function() {
 
     const fichiers = Array.from(homeAjoutPhotos.files ?? []).filter(
         function(fichier) {
-            return fichier.type.startsWith("image/") &&
+            return (fichier.type.startsWith("image/") || /\.hei[cf]$/i.test(fichier.name)) &&
                 fichier.size <= 10 * 1024 * 1024;
         }
     );

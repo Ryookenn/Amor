@@ -89,7 +89,7 @@
     supabaseClient.from('personal_favorites').insert({user_id:S.uid,kind:target.kind,target_id:String(target.id)});
    const {error}=await request;if(error)throw error;await refreshFavorites();invalidate();actions(parent,target);
   },line),'v5-quiet');
-  line.append(star,b('Un mot à deux',()=>openReactions(target),'v5-quiet'));parent.append(line);
+  line.append(star);if(!['stay','city'].includes(target.kind))line.append(b('Un mot à deux',()=>openReactions(target),'v5-quiet'));parent.append(line);
  }
  function installActions(){
   if(!S.uid)return;
@@ -269,12 +269,13 @@
  document.addEventListener('amor:data-ready',()=>{if(firstFit&&destinations.length){map.fitBounds(destinations.map(d=>[d.latitude,d.longitude]),{padding:[30,30],maxZoom:7});firstFit=false;}});
  async function identity(){
   const ticket=++accountTicket;const {data}=await supabaseClient.auth.getSession();if(ticket!==accountTicket)return;S.uid=data.session?.user?.id||null;
-  if(!S.uid)return;try{await fillProfile();if(ticket!==accountTicket)return;await refreshFavorites();if(ticket!==accountTicket)return;installActions();await rediscover();}catch(error){if(ticket===accountTicket)failure(hub,error,identity);}
+  if(!S.uid)return;try{await fillProfile();if(ticket!==accountTicket)return;await refreshFavorites();if(ticket!==accountTicket)return;installActions();await rediscover();if(ticket===accountTicket)document.dispatchEvent(new CustomEvent('amor:identity-ready'));}catch(error){if(ticket===accountTicket)failure(hub,error,identity);}
  }
  new MutationObserver(()=>{
   if($('#auth-screen').hidden)identity();else{accountTicket++;S.uid=null;S.profile=null;S.keepOriginals=true;invalidate();myFavorites.clear();
    panels.forEach(p=>{p.d.close();p.c.replaceChildren();});reactions.d.close();profileForm.reset();rediscovery.replaceChildren();if(printURL){URL.revokeObjectURL(printURL);printURL=null;}}
  }).observe($('#auth-screen'),{attributes:true,attributeFilter:['hidden']});
  if($('#auth-screen').hidden)identity();
+ Object.assign(S,{snapshot,invalidate,live,catalogue,openMoment,openFavorites,openWishes,openBook,openExports,openTrash,openReactions,refresh});
  document.addEventListener('amor:trashed',()=>{invalidate();});
 })();

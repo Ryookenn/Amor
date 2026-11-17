@@ -645,6 +645,7 @@
         original.draggable=false;offset(0);
     }
     function slide(direction){
+        window.amorResetZoom?.();
         const next=indexPhotoActive+direction;
         if(animating||next<0||next>=photosAffichees.length){offset(0,true);return;}
         animating=true;offset(-direction*stage.clientWidth,true);
@@ -695,4 +696,5 @@
     viewer.addEventListener('close',()=>{gesture=null;animating=false;clearTimeout(fallbackTimer);cancelAnimationFrame(frame);
         if(activeEnd){track.removeEventListener('transitionend',activeEnd);activeEnd=null;}offset(0);});
     new ResizeObserver(()=>{if(!gesture&&!animating)offset(0);}).observe(stage);
+    window.amorCarousel={busy:()=>animating,reset(){gesture=null;cancelAnimationFrame(frame);if(!animating)offset(0);}};
 })();

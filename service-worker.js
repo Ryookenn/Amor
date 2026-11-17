@@ -3,22 +3,28 @@
 // =========================
 
 const CACHE_NAME =
-    "amor-static-together-v5";
+    "amor-static-refinement-v6";
 
 
 const FICHIERS_ESSENTIELS = [
     "./",
     "./index.html",
     "./style.css?v=ux-mobile-2",
-    "./app.js?v=together-5",
+    "./app.js?v=refinement-6",
     "./experience.css?v=4",
-    "./experience.js?v=4",
+    "./experience.js?v=6",
     "./moments.css?v=4",
-    "./moments.js?v=5",
+    "./moments.js?v=6",
     "./foundation.js?v=5",
-    "./photos.js?v=5",
-    "./together.js?v=5",
+    "./photos.js?v=6",
+    "./together.js?v=6",
     "./together.css?v=5",
+    "./interface.js?v=6",
+    "./responses.js?v=6",
+    "./zoom.js?v=6",
+    "./catalogue.js?v=6",
+    "./transfers.js?v=6",
+    "./refinement.css?v=6",
     "./config.js",
     "./manifest.webmanifest",
     "./assets/icons/amor-favicon-32.png",
@@ -46,7 +52,8 @@ self.addEventListener(
                 })
                 .then(function() {
 
-                    return self.skipWaiting();
+                    // Une mise à jour attend la confirmation de l'utilisateur.
+                    return undefined;
 
                 })
 
@@ -54,6 +61,10 @@ self.addEventListener(
 
     }
 );
+
+self.addEventListener('message',event=>{
+    if(event.data?.type==='ACTIVATE_UPDATE') self.skipWaiting();
+});
 
 
 self.addEventListener(

@@ -138,8 +138,10 @@
     function mosaic() {
         const pictures = [...gallery.querySelectorAll('.photo-souvenir')];
         gallery.classList.toggle('amor-mosaic', pictures.length > 1);
-        pictures.forEach((picture, i) => {
-            picture.classList.toggle('amor-photo-extra', i > 4);
+        const chosen=pictures.filter(p=>p.dataset.mosaic!=='false');
+        pictures.forEach((picture) => {
+            const i=chosen.indexOf(picture);
+            picture.classList.toggle('amor-photo-extra', i < 0 || i > 4);
             picture.removeAttribute('data-more');
             if (i === 4 && pictures.length > 5) {
                 picture.dataset.more = `+${pictures.length - 5}`;
