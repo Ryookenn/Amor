@@ -75,12 +75,12 @@
   for(const job of jobs.values()){const {error}=await amorSafeRemove(job.parts.filter(p=>p.done).map(p=>p.path));if(error)throw error;}jobs.clear();panel.hidden=true;
  },V.settings.c),'v6-quiet');V.settings.c.append(cleanup);
 
- // Lecteur ZIP borné : archives AMOR produites en mode non compressé par V5/V6.
+ // Lecteur ZIP borné : archives AMOR produites en mode non compressé par V5/V6/V8.
  async function readZip(file){if(file.size>320*1024*1024)throw Error('Archive de 320 Mo maximum ; importez par séjour.');const buffer=await file.arrayBuffer(),view=new DataView(buffer),bytes=new Uint8Array(buffer),entries=new Map();let at=0;
   while(at+4<=bytes.length&&view.getUint32(at,true)===0x04034b50){
    if(at+30>bytes.length)throw Error('Archive tronquée.');const flags=view.getUint16(at+6,true),method=view.getUint16(at+8,true),crc=view.getUint32(at+14,true),size=view.getUint32(at+18,true),nameSize=view.getUint16(at+26,true),extra=view.getUint16(at+28,true);
-   if(method!==0||(flags&8))throw Error('Utilisez un ZIP AMOR V5/V6 non recompressé.');const name=new TextDecoder().decode(bytes.subarray(at+30,at+30+nameSize));const start=at+30+nameSize+extra,end=start+size;if(end>bytes.length)throw Error('Archive tronquée.');
-   if(name.split('/').includes('..')||name.startsWith('/')||name.includes('\\')||entries.has(name))throw Error('Chemin d’archive invalide.');const payload=bytes.subarray(start,end);if(amorCrc(payload)!==crc)throw Error('Un fichier est corrompu dans le ZIP.');entries.set(name,new Blob([payload]));at=end;
+   if(method!==0||(flags&8))throw Error('Utilisez un ZIP AMOR V5/V6/V8 non recompressé.');const name=new TextDecoder().decode(bytes.subarray(at+30,at+30+nameSize));const start=at+30+nameSize+extra,end=start+size;if(end>bytes.length)throw Error('Archive tronquée.');
+   if(name.split('/').includes('..')||name.startsWith('/')||name.includes(String.fromCharCode(92))||entries.has(name))throw Error('Chemin d’archive invalide.');const payload=bytes.subarray(start,end);if(amorCrc(payload)!==crc)throw Error('Un fichier est corrompu dans le ZIP.');entries.set(name,new Blob([payload]));at=end;
   }if(!entries.size)throw Error('Archive AMOR vide ou non reconnue.');return entries;
  }
  const restore=D('Réimporter une sauvegarde');
@@ -90,7 +90,7 @@
    const file=$('#v6-import-file').files[0];if(!file)throw Error('Choisissez une sauvegarde.');let entries=null,json;
    if(/\.zip$/i.test(file.name)){entries=await readZip(file);const meta=entries.get('AMOR-sauvegarde.json');if(!meta)throw Error('JSON de sauvegarde absent du ZIP.');json=JSON.parse(await meta.text());}
    else{if(file.size>12*1024*1024)throw Error('JSON de 12 Mo maximum.');json=JSON.parse(await file.text());}
-   if(![5,6].includes(json.schema_version))throw Error('Sauvegarde V5 ou V6 attendue.');
+   if(![5,6,8].includes(json.schema_version))throw Error('Sauvegarde V5, V6 ou V8 attendue.');
    const {data:report,error}=await supabaseClient.rpc('amor_import',{p_data:json,p_apply:false});if(error)throw error;
    const parent=$('#v6-import-report');parent.replaceChildren(E('h3','Aperçu'),E('p',`${report.missing} ligne(s) manquante(s), ${report.existing_unchanged} ligne(s) existante(s) conservée(s).`));
    for(const [table,count]of Object.entries(report.tables))parent.append(E('p',`${table} : ${count} ajout(s) possible(s)`));
@@ -101,6 +101,7 @@
      if(!path)continue;if(path.split('/').includes('..')||path.startsWith('/')||path.includes('\\'))throw Error('Chemin de média invalide.');
      const name=path.split('/').pop().replace(/[^a-zA-Z0-9._-]/g,'_'),entry=`medias/${m.stay_id}/${m.id}-${kind}-${name}`;paths.set(path,entries?.get(entry)||paths.get(path));
     }
+    for(const w of json.shared_wishes||[])for(const a of w.inspirations||[]){if(a.kind!=='image'||!a.path)continue;const path=a.path;if(path.split('/').includes('..')||path.startsWith('/')||path.includes('\\'))throw Error('Chemin d’inspiration invalide.');const name=path.split('/').pop().replace(/[^a-zA-Z0-9._-]/g,'_');paths.set(path,entries?.get(`envies/${w.id}/${a.id}-${name}`)||paths.get(path));}
     for(const [path,blob]of paths){
      const {data:present,error:downloadError}=await supabaseClient.storage.from('memories').download(path);if(present&&!downloadError)continue;
      if(!blob)throw Error('Fichier source manquant : '+path+'. Fournissez le ZIP contenant les médias.');

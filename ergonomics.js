@@ -137,6 +137,7 @@
  const changes=new MutationObserver(records=>{for(const r of records)for(const node of r.addedNodes)if(node.nodeType===1){if(node.tagName==='FORM')installHistory(node);accessibility(node);}});
  document.addEventListener('DOMContentLoaded',()=>{
   $('#modifier-fiche').setAttribute('aria-label','Modifier ce souvenir');
+  const homeEdit=$('#modifier-home'),homeActions=$('#home-dialog .home-header-actions');if(homeEdit&&homeActions){homeEdit.classList.add('v8-home-edit');homeEdit.setAttribute('aria-label','Modifier notre page');homeEdit.replaceChildren($('#modifier-fiche svg').cloneNode(true),E('span','Modifier'));homeActions.prepend(homeEdit);}
   ['amine-note','maena-note'].forEach(id=>rating($('#'+id)));accessibility(document);changes.observe(document.body,{childList:true,subtree:true});renderPinned();renderRecent();
   const more=$('.mom-more');if(more){const sheet=M.secondary($('#souvenir-dialog'),[...more.querySelectorAll('.mom-more-menu>button')],'Options du souvenir');more.remove();sheet?.d.classList.add('v7-danger-sheet');}
   const covers=[...document.querySelectorAll('.mom-cover-trigger')];for(const b of covers){const owner=b.closest('dialog');if(owner)M.secondary(owner,[b],owner.id==='home-dialog'?'Options de notre chez-nous':'Options du souvenir');}

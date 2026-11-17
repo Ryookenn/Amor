@@ -3,31 +3,33 @@
 // =========================
 
 const CACHE_NAME =
-    "amor-static-consolidation-v7";
+    "amor-static-discovery-v8";
 
 
 const FICHIERS_ESSENTIELS = [
     "./",
     "./index.html",
     "./style.css?v=ux-mobile-2",
-    "./app.js?v=7",
+    "./app.js?v=8",
     "./experience.css?v=4",
-    "./experience.js?v=7",
+    "./experience.js?v=8",
     "./moments.css?v=4",
-    "./moments.js?v=7",
+    "./moments.js?v=8",
     "./foundation.js?v=5",
-    "./photos.js?v=7",
-    "./together.js?v=7",
+    "./photos.js?v=8",
+    "./together.js?v=8",
     "./together.css?v=5",
-    "./interface.js?v=7",
-    "./responses.js?v=7",
-    "./zoom.js?v=7",
-    "./ergonomics.js?v=7",
-    "./viewer.js?v=7",
-    "./catalogue.js?v=7",
-    "./transfers.js?v=7",
+    "./interface.js?v=8",
+    "./responses.js?v=8",
+    "./zoom.js?v=8",
+    "./ergonomics.js?v=8",
+    "./viewer.js?v=8",
+    "./catalogue.js?v=8",
+    "./transfers.js?v=8",
+    "./wishes.js?v=8",
     "./refinement.css?v=6",
     "./ergonomics.css?v=7",
+    "./discovery.css?v=8",
     "./config.js",
     "./manifest.webmanifest",
     "./assets/icons/amor-favicon-32.png",

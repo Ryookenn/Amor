@@ -27,7 +27,7 @@
   try{localStorage.setItem('amor:theme',value);}catch{} }
  let stored='system';try{stored=localStorage.getItem('amor:theme')||'system';}catch{}setTheme(['system','light','dark'].includes(stored)?stored:'system');
  theme.onchange=()=>setTheme(theme.value);mediaTheme.addEventListener('change',()=>{if(V.theme==='system')setTheme('system');});
- settings.c.append(E('p','AMOR · version 7.0','v6-version'));
+ settings.c.append(E('p','AMOR · version 8.0','v6-version'));
  settings.c.append(E('h3','Session'),$('#deconnexion'));
  V.settings=settings;
 
@@ -90,7 +90,7 @@
  const open=ouvrirFiche;ouvrirFiche=async function(...args){readingTop=0;return open(...args);};
 
  // Synchronisation par horloge : aucun remplacement pendant une saisie ou un upload.
- let dirtyForms=new Set(),version=null,channel=null,poll=null,debounce=null,refreshing=false,pendingRemote=false;
+ let dirtyForms=new Set(),version=null,channel=null,poll=null,debounce=null,refreshing=false,pendingRemote=false,wishesDeferred=false;
  document.addEventListener('input',e=>{const f=e.target.closest('form');if(f)dirtyForms.add(f);V.dirty=dirtyForms.size>0;});
  ['amor:saved','amor:home-saved','amor:moment-saved'].forEach(name=>document.addEventListener(name,()=>{dirtyForms.clear();V.dirty=false;}));
  const banner=E('div',null,'v6-sync-banner');banner.hidden=true;banner.setAttribute('role','status');
@@ -99,7 +99,7 @@
   if(V.uploading){alert('Attendez la fin de l’envoi ou annulez-le.');return;}dirtyForms.clear();V.dirty=false;afficherModeConsultation();remoteRefresh(true);
  },'v6-quiet'));banner.hidden=false;(document.activeElement?.closest('dialog')||($('#souvenir-dialog').open?$('#souvenir-dialog'):$('#home-dialog').open?$('#home-dialog'):document.body)).append(banner);}
  function isBusy(){return V.uploading||(modeEdition&&formulaireModifie)||[...dirtyForms].some(f=>f.isConnected&&!f.hidden&&f.getClientRects().length)||document.querySelector('.visionneuse[open],.mom-dialog[open] form,.v5-dialog[open] form,.v6-dialog[open]');}
- async function remoteRefresh(force=false){if(!S.uid)return;if(refreshing){pendingRemote=true;return;}if(!force&&isBusy()){showRemote();return;}
+ async function remoteRefresh(force=false){if(!S.uid)return;if(window.AmorWishes?.isOpen()){wishesDeferred=true;banner.hidden=true;return;}if(refreshing){pendingRemote=true;return;}if(!force&&isBusy()){showRemote();return;}
   refreshing=true;try{const id=destinationActive?.id,stay=souvenirsActifs?.id,home=homeActif?.id,reading=$('#souvenir-dialog').scrollTop,homeReading=$('#home-dialog').scrollTop;
    S.invalidate();await chargerDestinationsDepuisSupabase();await chargerPremieresFois();
    if($('#souvenir-dialog').open&&id){const d=destinations.find(d=>d.id===id);if(d)await ouvrirFiche(d,stay);else $('#souvenir-dialog').close();}
@@ -109,8 +109,9 @@
   }catch{showRemote();}finally{refreshing=false;if(pendingRemote){pendingRemote=false;clearTimeout(debounce);debounce=setTimeout(()=>remoteRefresh(),900);}}
  }
  async function checkVersion(){if(!S.uid||document.hidden)return;const {data,error}=await supabaseClient.rpc('amor_sync_version');if(error||data==null)return;
-  if(version!==null&&BigInt(data)>BigInt(version)){version=data;V.refreshResponses?.();clearTimeout(debounce);debounce=setTimeout(()=>remoteRefresh(),900);}else if(version===null)version=data;
+  if(version!==null&&BigInt(data)>BigInt(version)){version=data;V.refreshResponses?.();document.dispatchEvent(new CustomEvent('amor:sync-detected'));clearTimeout(debounce);if(window.AmorWishes?.isOpen()){wishesDeferred=true;banner.hidden=true;return;}debounce=setTimeout(()=>remoteRefresh(),900);}else if(version===null)version=data;
  }
+ document.addEventListener('amor:wishes-closed',()=>{if(!wishesDeferred)return;wishesDeferred=false;clearTimeout(debounce);debounce=setTimeout(()=>remoteRefresh(),900);});
  V.refreshRemote=remoteRefresh;
  document.addEventListener('close',()=>{setTimeout(()=>{if(!banner.hidden&&!isBusy())remoteRefresh();},100);},true);
  function startSync(){if(channel)supabaseClient.removeChannel(channel);clearInterval(poll);version=null;
@@ -118,7 +119,7 @@
   poll=setInterval(checkVersion,45000);checkVersion();
  }
  document.addEventListener('amor:identity-ready',startSync);window.addEventListener('focus',checkVersion);document.addEventListener('visibilitychange',checkVersion);
- new MutationObserver(()=>{if($('#auth-screen').hidden)return;clearInterval(poll);clearTimeout(debounce);if(channel){supabaseClient.removeChannel(channel);channel=null;}dirtyForms.clear();V.dirty=false;banner.hidden=true;}).observe($('#auth-screen'),{attributes:true,attributeFilter:['hidden']});
+ new MutationObserver(()=>{if($('#auth-screen').hidden)return;clearInterval(poll);clearTimeout(debounce);if(channel){supabaseClient.removeChannel(channel);channel=null;}dirtyForms.clear();V.dirty=false;wishesDeferred=false;banner.hidden=true;}).observe($('#auth-screen'),{attributes:true,attributeFilter:['hidden']});
  if(S.uid)startSync();
 
  // Mise à jour explicite : le service worker attend, jamais de rechargement forcé.

@@ -6767,33 +6767,7 @@ boutonOuvrirPremieresFois.addEventListener(
     "click",
     async function() {
 
-        fermerFormulairePremiereFois();
-
-        premieresFoisDialog.showModal();
-
-
-        listePremieresFoisAVivre.textContent =
-            "Chargement…";
-
-        listePremieresFoisRealisees.textContent =
-            "Chargement…";
-
-
-        try {
-
-            await chargerPremieresFois();
-
-        } catch (erreur) {
-
-            listePremieresFoisAVivre.textContent =
-                "Impossible de charger la liste.";
-
-            listePremieresFoisRealisees.textContent =
-                "";
-
-            document.dispatchEvent(new CustomEvent("amor:first-times-error"));
-
-        }
+        window.amorNavigate?.('premieres');
 
     }
 );
@@ -6803,7 +6777,7 @@ boutonFermerPremieresFois.addEventListener(
     "click",
     function() {
 
-        premieresFoisDialog.close();
+        window.amorNavigate?.('accueil');
 
     }
 );
@@ -6813,11 +6787,7 @@ premieresFoisDialog.addEventListener(
     "click",
     function(event) {
 
-        if (event.target === premieresFoisDialog) {
-
-            premieresFoisDialog.close();
-
-        }
+        // Cette rubrique est une page : aucun clic sur son fond ne la ferme.
 
     }
 );

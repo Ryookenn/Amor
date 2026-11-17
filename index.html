@@ -79,6 +79,7 @@
     <link rel="stylesheet" href="together.css?v=5">
     <link rel="stylesheet" href="refinement.css?v=6">
     <link rel="stylesheet" href="ergonomics.css?v=7">
+    <link rel="stylesheet" href="discovery.css?v=8">
 </head>
 
 <body>
@@ -459,7 +460,7 @@
                 <button
                     id="ouvrir-premieres-fois"
                     class="ouvrir-premieres-fois"
-                    aria-haspopup="dialog"
+                    aria-controls="premieres-fois-dialog"
                     type="button">
                     Découvrir notre liste
                 </button>
@@ -696,10 +697,11 @@
         NOS PREMIÈRES FOIS
     ========================= -->
 
-    <dialog
+    <section
         id="premieres-fois-dialog"
-        class="premieres-fois-dialog"
-        aria-labelledby="premieres-fois-titre">
+        class="premieres-fois-dialog v8-first-page"
+        aria-labelledby="premieres-fois-titre"
+        hidden>
 
         <div class="premieres-fois-header">
 
@@ -960,7 +962,7 @@
 
         </div>
 
-    </dialog>
+    </section>
 
     <!-- =========================
         FICHE PERMANENTE D’UN HOME
@@ -977,13 +979,15 @@
                 <h2 id="home-ville"></h2>
             </div>
 
-            <button
-                id="fermer-home"
-                class="fermer-home"
-                type="button"
-                aria-label="Fermer la fiche">
-                ×
-            </button>
+            <div class="home-header-actions">
+                <button
+                    id="fermer-home"
+                    class="fermer-home"
+                    type="button"
+                    aria-label="Fermer la fiche">
+                    ×
+                </button>
+            </div>
         </header>
 
         <div class="home-contenu">
@@ -2231,18 +2235,19 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="foundation.js?v=5"></script>
-    <script src="app.js?v=7"></script>
-    <script src="experience.js?v=7"></script>
-    <script src="photos.js?v=7"></script>
-    <script src="moments.js?v=7"></script>
-    <script src="together.js?v=7"></script>
-    <script src="interface.js?v=7"></script>
-    <script src="responses.js?v=7"></script>
-    <script src="zoom.js?v=7"></script>
-    <script src="ergonomics.js?v=7"></script>
-    <script src="viewer.js?v=7"></script>
-    <script src="catalogue.js?v=7"></script>
-    <script src="transfers.js?v=7"></script>
+    <script src="app.js?v=8"></script>
+    <script src="experience.js?v=8"></script>
+    <script src="photos.js?v=8"></script>
+    <script src="moments.js?v=8"></script>
+    <script src="together.js?v=8"></script>
+    <script src="interface.js?v=8"></script>
+    <script src="responses.js?v=8"></script>
+    <script src="zoom.js?v=8"></script>
+    <script src="ergonomics.js?v=8"></script>
+    <script src="viewer.js?v=8"></script>
+    <script src="catalogue.js?v=8"></script>
+    <script src="transfers.js?v=8"></script>
+    <script src="wishes.js?v=8"></script>
 
 </body>
 

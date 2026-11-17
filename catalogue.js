@@ -113,8 +113,8 @@
  }
  const albumStay=M.button('Organiser l’album',()=>openAlbum(false),'image'),albumHomeButton=M.button('Organiser l’album',()=>openAlbum(true),'image');
  M.secondary($('#souvenir-dialog'),[albumStay],'Options du souvenir');M.secondary($('#home-dialog'),[albumHomeButton],'Options de notre chez-nous');
- $('#galerie-photos').after(B('Voir tout l’album',()=>{if(photosAffichees.length)ouvrirVisionneuse(0);},'v6-album-all'));
- $('#home-galerie').after(B('Voir tout l’album',()=>{if(photosAffichees.length)ouvrirVisionneuse(0);},'v6-album-all'));
+ const allStay=B('Voir tout l’album',()=>{if(photosAffichees.length)ouvrirVisionneuse(0);},'v6-album-all'),allHome=B('Voir tout l’album',()=>{if(photosAffichees.length)ouvrirVisionneuse(0);},'v6-album-all');allStay.hidden=allHome.hidden=true;$('#galerie-photos').after(allStay);$('#home-galerie').after(allHome);
+ document.addEventListener('amor:photos-ready',()=>{allStay.hidden=!mediasPhotosActifs.length;allHome.hidden=!homeMediasActifs.length;});
  V.openLibrary=openLibrary;V.openJourneys=openJourneys;
  new MutationObserver(()=>{if($('#auth-screen').hidden)return;libraryTicket++;photoTicket++;moreObserver?.disconnect();photoZoom?.destroy();data=null;urls.clear();libraryRows=[];albumRows=[];libraryState={query:'',city:'',year:'',fav:false};libraryAccount=null;library.c.replaceChildren();photoView.c.replaceChildren();album.c.replaceChildren();}).observe($('#auth-screen'),{attributes:true,attributeFilter:['hidden']});
 })();

@@ -58,10 +58,8 @@
     main.insertBefore(dashboard, $('.premieres-fois-resume'));
     $('.hero-description').textContent = 'Nos escapades, nos habitudes, et tout ce qui fait nous.';
 
-    const shortcuts = document.createElement('div');
-    shortcuts.className = 'amor-shortcuts';
-    shortcuts.innerHTML = `<button type="button" data-route="carte">${icon('map')}<span>Explorer la carte</span>${icon('right')}</button><button type="button" data-route="homes">${icon('home')}<span>Paris & Lyon</span>${icon('right')}</button>`;
-    $('.hero').append(shortcuts);
+    const firstPage=$('#premieres-fois-dialog');main.append(firstPage);
+    $('#fermer-premieres-fois').hidden=true;
     const nav = document.createElement('nav');
     nav.className = 'amor-tabbar';
     nav.setAttribute('aria-label', 'Navigation principale');
@@ -71,26 +69,23 @@
     document.body.append(nav);
     document.body.dataset.amorRoute = 'accueil';
     let activeRoute = 'accueil';
+    const scrollPositions=new Map();
     function route(name) {
-        if (name === 'premieres') {
-            nav.querySelectorAll('button').forEach(button => {
-                button.setAttribute('aria-current', button.dataset.route === 'premieres' ? 'page' : 'false');
-            });
-            $('#ouvrir-premieres-fois').click();
-            return;
-        }
+        if(!['accueil','carte','premieres','homes'].includes(name))return;
+        scrollPositions.set(activeRoute,scrollY);
+        const changed=activeRoute!==name;
         activeRoute = name;
         document.body.dataset.amorRoute = name;
+        firstPage.hidden=name!=='premieres';
         nav.querySelectorAll('button').forEach(button => {
             button.setAttribute('aria-current', button.dataset.route === name ? 'page' : 'false');
         });
-        if (matchMedia('(max-width: 700px)').matches) {
-            window.scrollTo({ top: 0, behavior: 'instant' });
-        } else if (name !== 'accueil') {
-            $(name === 'carte' ? '.map-section' : '.homes-section').scrollIntoView({ behavior: motion() ? 'smooth' : 'instant' });
-        }
+        if(changed)window.scrollTo({top:scrollPositions.get(name)||0,behavior:'instant'});
         requestAnimationFrame(() => { if (typeof map !== 'undefined') map.invalidateSize(); });
+        if(name==='premieres'&&changed)chargerPremieresFois().catch(()=>{document.dispatchEvent(new CustomEvent('amor:first-times-error'));});
+        document.dispatchEvent(new CustomEvent('amor:route-change',{detail:{route:name}}));
     }
+    window.amorNavigate=route;
     route('accueil');
     document.addEventListener('click', event => {
         const button = event.target.closest('[data-route]');
@@ -98,10 +93,9 @@
     });
     $('.logo').addEventListener('click', event => { event.preventDefault(); route('accueil'); });
     const auth = $('#auth-screen');
-    const syncAuth = () => document.body.classList.toggle('amor-connected', auth.hidden);
+    const syncAuth = () => {document.body.classList.toggle('amor-connected', auth.hidden);if(!auth.hidden){fermerFormulairePremiereFois();$('#liste-premieres-fois-a-vivre').replaceChildren();$('#liste-premieres-fois-realisees').replaceChildren();route('accueil');scrollPositions.clear();}};
     new MutationObserver(syncAuth).observe(auth, { attributes: true, attributeFilter: ['hidden'] });
     syncAuth();
-    $('#premieres-fois-dialog').addEventListener('close', () => route(activeRoute));
 
     // Photo principale du séjour courant : pas une photo d'un autre séjour.
     function makeCover(dialog, source, title, subtitle) {

@@ -144,9 +144,9 @@
  }
 
  // Envies : édition libre puis conversion atomique, uniquement sur demande.
- async function openWishes(){wishes.c.replaceChildren(node('p','Chargement…'));if(!wishes.d.open)wishes.d.showModal();try{
+ async function openWishes(){if(window.AmorWishes)return window.AmorWishes.open();wishes.c.replaceChildren(node('p','Chargement…'));if(!wishes.d.open)wishes.d.showModal();try{
   const {data,error}=await supabaseClient.from('shared_wishes').select('*').is('deleted_at',null).order('created_at',{ascending:false});if(error)throw error;wishes.c.replaceChildren(node('p','Des propositions sans échéance, à garder tant qu’elles vous font envie.'));
-  wishes.c.append(b('Garder une nouvelle envie',()=>editWish()));
+  wishes.c.append(b('Et si on partait…',()=>editWish()));
   data.forEach(w=>{const card=node('article',null,'v5-note');card.append(node('h3',w.title),node('p',w.description),node('small',w.destination?.ville?[w.destination.ville,w.destination.countryName].filter(Boolean).join(' · '):'Pas de destination imposée'));
    card.append(b('Modifier',()=>editWish(w),'v5-quiet'));
    if(w.converted_stay_id)card.append(b('Revoir ce voyage',async()=>{wishes.d.close();const dest=destinations.find(d=>d.id===w.destination?.id);if(dest)await ouvrirFiche(dest,w.converted_stay_id);else alert('Le voyage est peut-être dans la corbeille.');}));
@@ -209,8 +209,9 @@
     total+=blob.size;if(total>300*1024*1024)throw Error('Plus de 300 Mo : choisissez une seule ville pour ce téléchargement.');
     const name=path.split('/').pop().replace(/[^a-zA-Z0-9._-]/g,'_');entries.push({name:`medias/${m.stay_id}/${m.id}-${kind}-${name}`,blob});
    }
+   for(const w of data.shared_wishes||[])for(const a of w.inspirations||[]){if(a.kind!=='image'||!a.path||done.has(a.path))continue;done.add(a.path);const {data:blob,error}=await supabaseClient.storage.from('memories').download(a.path);if(error)throw Error('Une image d’envie est indisponible. Réessayez sans supprimer sa référence.');total+=blob.size;if(total>300*1024*1024)throw Error('Archive de plus de 300 Mo. Exportez les textes et conservez séparément vos fichiers.');const name=a.path.split('/').pop().replace(/[^a-zA-Z0-9._-]/g,'_');entries.push({name:`envies/${w.id}/${a.id}-${name}`,blob});}
    amorDownload(await amorZip(entries),'AMOR-medias-et-sauvegarde.zip');
-  },exports.c));exports.c.append(json,media,node('p','Les originaux ne sont inclus que s’ils ont été conservés à l’ajout. Les avatars sont référencés dans le JSON ; le ZIP ci-dessus rassemble les photos et vocaux des souvenirs.'));
+  },exports.c));exports.c.append(json,media,node('p','Les originaux ne sont inclus que s’ils ont été conservés à l’ajout. Les avatars sont référencés dans le JSON ; le ZIP rassemble les photos et vocaux des souvenirs sélectionnés et toutes les images de Nos envies.'));
   const status=node('p');status.setAttribute('role','status');
   const optimize=b('Accélérer les anciens albums',()=>run(optimize,async()=>{
    const data=await snapshot(true);const ids=new Set(data.stays.filter(inScope).map(s=>String(s.id)));
