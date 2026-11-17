@@ -3,28 +3,31 @@
 // =========================
 
 const CACHE_NAME =
-    "amor-static-refinement-v6";
+    "amor-static-consolidation-v7";
 
 
 const FICHIERS_ESSENTIELS = [
     "./",
     "./index.html",
     "./style.css?v=ux-mobile-2",
-    "./app.js?v=refinement-6",
+    "./app.js?v=7",
     "./experience.css?v=4",
-    "./experience.js?v=6",
+    "./experience.js?v=7",
     "./moments.css?v=4",
-    "./moments.js?v=6",
+    "./moments.js?v=7",
     "./foundation.js?v=5",
-    "./photos.js?v=6",
-    "./together.js?v=6",
+    "./photos.js?v=7",
+    "./together.js?v=7",
     "./together.css?v=5",
-    "./interface.js?v=6",
-    "./responses.js?v=6",
-    "./zoom.js?v=6",
-    "./catalogue.js?v=6",
-    "./transfers.js?v=6",
+    "./interface.js?v=7",
+    "./responses.js?v=7",
+    "./zoom.js?v=7",
+    "./ergonomics.js?v=7",
+    "./viewer.js?v=7",
+    "./catalogue.js?v=7",
+    "./transfers.js?v=7",
     "./refinement.css?v=6",
+    "./ergonomics.css?v=7",
     "./config.js",
     "./manifest.webmanifest",
     "./assets/icons/amor-favicon-32.png",

@@ -64,7 +64,7 @@
             const links=await signed(data);
             if(ticket!==stayRequest||String(souvenirsActifs.id)!==String(stay.id))return;
             mediasPhotosActifs=hydrate(data,links);
-            photosAffichees=mediasPhotosActifs.map(m=>({url:m.url,texteAlternatif:m.caption||m.original_name||'Notre photo'}));
+            photosAffichees=mediasPhotosActifs.map(m=>({url:m.url,thumbUrl:m.thumbUrl,texteAlternatif:m.caption||m.original_name||'Notre photo'}));
             mediasPhotosActifs.forEach((m,i)=>{
                 const photo=creerElementPhoto(m.thumbUrl,m.original_name||`Photo ${i+1}`,()=>ouvrirVisionneuse(i));
                 photo.dataset.mediaId=m.id;galeriePhotos.append(photo);
@@ -82,7 +82,7 @@
         if(error)throw error;
         const links=await signed(data);if(ticket!==homeRequest||homeActif?.id!==destination.id)return;
         homeMediasActifs=hydrate(data,links);
-        photosAffichees=homeMediasActifs.map(m=>({url:m.url,texteAlternatif:m.caption||m.original_name||'Notre photo'}));
+        photosAffichees=homeMediasActifs.map(m=>({url:m.url,thumbUrl:m.thumbUrl,texteAlternatif:m.caption||m.original_name||'Notre photo'}));
         homeMediasActifs.forEach((m,i)=>{
             const card=document.createElement('div');card.className='home-photo';card.dataset.mediaId=m.id;
             card.classList.toggle('v6-hidden-mosaic',m.in_mosaic===false);

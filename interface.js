@@ -27,7 +27,7 @@
   try{localStorage.setItem('amor:theme',value);}catch{} }
  let stored='system';try{stored=localStorage.getItem('amor:theme')||'system';}catch{}setTheme(['system','light','dark'].includes(stored)?stored:'system');
  theme.onchange=()=>setTheme(theme.value);mediaTheme.addEventListener('change',()=>{if(V.theme==='system')setTheme('system');});
- settings.c.append(E('p','AMOR · version 6.0','v6-version'));
+ settings.c.append(E('p','AMOR · version 7.0','v6-version'));
  settings.c.append(E('h3','Session'),$('#deconnexion'));
  V.settings=settings;
 

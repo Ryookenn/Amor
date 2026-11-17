@@ -177,7 +177,7 @@
         const account = userId;
         loadTask=(async()=>{
             const [stays,fragments,badges,cities,travelFragments] = await Promise.all([
-                rows('stays','id,city_id,date_start,date_end,created_at,shared_quote,music,amine_place,amine_meal,amine_quote,maena_place,maena_meal,maena_quote'),
+                rows('stays','id,city_id,date_start,date_end,created_at,shared_quote,music,amine_place,amine_meal,amine_quote,amine_rating,maena_place,maena_meal,maena_quote,maena_rating'),
                 rows('home_items','id,city_id,title,content,item_type,happened_on,created_at'),
                 rows('first_times','id,title,description,stay_id,unlocked_on,created_at'),
                 rows('cities','id,name,experience_type'),
@@ -196,12 +196,12 @@
                 const home=city.experience_type==='home';
                 mapped.push({type:home?'fragment':'voyage',title:home?`Notre page à ${city.name}`:`Séjour à ${city.name}`,city:city.name,cityId:s.city_id,stayId:s.id,
                     date:home?null:s.date_start,caption:s.shared_quote || s.music || 'Un moment de notre histoire.',
-                    search:Object.values(s).filter(v=>typeof v==='string').join(' ')});
+                    search:Object.values(s).filter(v=>v!==null).join(' '),answers:s});
             });
             fragments.forEach(f=>{
                 const city=cityMap.get(String(f.city_id)); if(!city) return;
                 mapped.push({type:'fragment',title:f.title,city:city.name,cityId:f.city_id,date:f.happened_on,
-                    caption:f.content || (f.item_type==='habit'?'Notre habitude':'Notre anecdote'),search:f.content});
+                    caption:f.content || (f.item_type==='habit'?'Notre habitude':'Notre anecdote'),search:f.content,itemId:f.id});
             });
             travelFragments.forEach(f=>{
                 const city=cityMap.get(String(f.city_id)); if(!city)return;
@@ -219,46 +219,56 @@
         })().finally(()=>{loadTask=null;});
         return loadTask;
     }
+    const responseFields=[['amine_place','vue-amine-lieu','Lieu d’Amine'],['amine_meal','vue-amine-repas','Repas d’Amine'],['amine_quote','vue-amine-phrase','Phrase d’Amine'],['amine_rating','vue-amine-note','Note d’Amine'],['maena_place','vue-maena-lieu','Lieu de Maéna'],['maena_meal','vue-maena-repas','Repas de Maéna'],['maena_quote','vue-maena-phrase','Phrase de Maéna'],['maena_rating','vue-maena-note','Note de Maéna'],['shared_quote','vue-phrase-commune','Phrase commune'],['music','vue-musique','Musique']];
+    function matchResponse(record){const words=normal($('#mom-search').value).trim().split(/\s+/).filter(Boolean);if(!words.length||!record.answers)return null;
+        return responseFields.map(([key,id,label])=>({id,label,value:record.answers[key],score:words.filter(w=>normal(record.answers[key]).includes(w)).length})).filter(m=>m.value!==null&&m.value!==undefined&&m.score>0).sort((a,b)=>b.score-a.score)[0]||null;
+    }
     async function openRecord(record) {
-        const target=destinations.find(d=>String(d.id)===String(record.cityId));
-        if(target){
-            finder.d.close(); await ouvrirFiche(target,record.stayId || null);
+      const matched=matchResponse(record),target=destinations.find(d=>String(d.id)===String(record.cityId));
+      const action=async()=>{if(target){
+            await ouvrirFiche(target,record.stayId || null);
             if(record.type==='fragment'){
                 if(target.experienceType==='home'){
-                    const card=[...document.querySelectorAll('.home-item')].find(c=>c.querySelector('h4')?.textContent===record.title);
-                    card?.scrollIntoView({block:'center',behavior:reduced()?'instant':'smooth'});
+                    const card=[...document.querySelectorAll('.home-item')].find(c=>String(c.dataset.itemId)===String(record.itemId)||c.querySelector('h4')?.textContent===record.title);
+                    AmorV7.highlight(card);
                 }else if(record.fragmentId){
                     await loadStayFragments();
-                    document.querySelector(`[data-fragment-id="${record.fragmentId}"]`)?.scrollIntoView({block:'center',behavior:reduced()?'instant':'smooth'});
+                    AmorV7.highlight(document.querySelector(`[data-fragment-id="${record.fragmentId}"]`));
                 }
             }
-        } else { finder.d.close(); $('#ouvrir-premieres-fois').click(); }
+            if(matched&&target.experienceType!=='home'){const n=$('#'+matched.id),card=n?.closest('.reponse-personne');if(card?.classList.contains('v6-person-off'))card.parentElement.previousElementSibling.querySelector(`[aria-controls="${card.id}"]`)?.click();AmorV7.highlight(n);}
+        } else { $('#ouvrir-premieres-fois').click(); }};
+      await AmorV7.visit(finder.d,action,searchMode?'la recherche':'notre fil');
     }
     function renderRecords() {
         const query=normal($('#mom-search').value).trim();
         const items=records.filter(r=>(filter==='all'||r.type===filter) && (searchMode || (r.type!=='ville' && !r.pending)) &&
             (!query || query.split(/\s+/).every(word=>normal([r.title,r.city,r.caption,r.search].join(' ')).includes(word))));
         items.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-        resultList.replaceChildren();
+        resultList.replaceChildren();const chips=finder.content.querySelector('.v7-search-chips')||el('div',null,'v7-chips v7-search-chips');if(!chips.isConnected)resultList.before(chips);chips.replaceChildren();
+        if(query)chips.append(button('Recherche : '+$('#mom-search').value+' · Retirer',()=>{$('#mom-search').value='';renderRecords();},'v6-quiet'));
+        if(filter!=='all')chips.append(button('Filtre : '+filter+' · Retirer',()=>{filter='all';renderRecords();},'v6-quiet'));
+        if(chips.children.length)chips.append(button('Tout réinitialiser',()=>{$('#mom-search').value='';filter='all';renderRecords();},'v6-quiet'));
         finder.content.querySelector('.mom-search-meta').textContent=`${items.length} résultat${items.length>1?'s':''}${!searchMode?' · Les fragments sans date sont réunis en fin de fil.':''}`;
         finder.content.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===filter)));
         if(!items.length) resultList.append(el('p','Rien pour le moment. Essayez un autre mot ou un autre filtre.','mom-empty'));
         items.forEach(r=>{
-            const card=button('',()=>openRecord(r),'mom-record');
+            const card=button('',()=>openRecord(r),'mom-record'),match=matchResponse(r);
             card.append(el('small',`${r.type==='badge'?'Première fois':r.type==='voyage'?'Voyage':r.type==='ville'?'Ville':'Fragment'} · ${r.city}`),el('strong',r.title),
-                el('span',r.caption),el('time',r.date?formaterDate(r.date):r.pending?'À vivre, si l’envie nous prend':'Sans date imposée'));
+                el('span',match?`${match.label} : ${match.value}`:r.caption),el('time',r.date?formaterDate(r.date):r.pending?'À vivre, si l’envie nous prend':'Sans date imposée'));
             resultList.append(card);
         });
     }
     async function openFinder(search) {
-        searchMode=search; $('#mom-search').value=''; filter='all';
+        const scroll=finder.d.scrollTop;if(searchMode!==search){$('#mom-search').value='';filter='all';}searchMode=search;
         if(!finder.d.open) finder.d.showModal();
         finder.content.querySelector('h2');
         resultList.replaceChildren(el('div','Chargement de notre histoire…','mom-skeleton'));
-        try { await buildIndex(); if(finder.d.open){renderRecords(); if(search) $('#mom-search').focus();} }
+        try { await buildIndex(); if(finder.d.open){renderRecords();finder.d.scrollTop=scroll;if(search) $('#mom-search').focus({preventScroll:true});} }
         catch { resultList.replaceChildren(); errorBox(resultList,'Notre histoire ne peut pas être chargée. Vos données sont conservées.',()=>openFinder(search)); }
     }
     $('#mom-search').addEventListener('input',renderRecords);
+    document.addEventListener('amor:remote-update',()=>{indexDirty=true;});
     finder.content.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.filter;renderRecords();}));
     const tools=el('div',null,'mom-home-tools');
     tools.append(button('Ajouter un moment',()=>openQuick()),button('Notre fil',()=>openFinder(false)),button('Rechercher',()=>openFinder(true)));
@@ -696,5 +706,5 @@
     viewer.addEventListener('close',()=>{gesture=null;animating=false;clearTimeout(fallbackTimer);cancelAnimationFrame(frame);
         if(activeEnd){track.removeEventListener('transitionend',activeEnd);activeEnd=null;}offset(0);});
     new ResizeObserver(()=>{if(!gesture&&!animating)offset(0);}).observe(stage);
-    window.amorCarousel={busy:()=>animating,reset(){gesture=null;cancelAnimationFrame(frame);if(!animating)offset(0);}};
+    window.amorCarousel={busy:()=>animating,goTo(index){if(animating||index<0||index>=photosAffichees.length)return;gesture=null;cancelAnimationFrame(frame);if(Math.abs(index-indexPhotoActive)===1){slide(index-indexPhotoActive);return;}indexPhotoActive=index;actualiserVisionneuse();neighbours();},reset(){gesture=null;cancelAnimationFrame(frame);if(!animating)offset(0);}};
 })();
