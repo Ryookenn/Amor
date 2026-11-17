@@ -6718,10 +6718,6 @@ async function supprimerPremiereFois(
             .eq(
                 "id",
                 premiereFois.id
-            )
-            .is(
-                "stay_id",
-                null
             );
 
 
