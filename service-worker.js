@@ -3,18 +3,22 @@
 // =========================
 
 const CACHE_NAME =
-    "amor-static-moments-v4";
+    "amor-static-together-v5";
 
 
 const FICHIERS_ESSENTIELS = [
     "./",
     "./index.html",
     "./style.css?v=ux-mobile-2",
-    "./app.js?v=moments-4",
+    "./app.js?v=together-5",
     "./experience.css?v=4",
     "./experience.js?v=4",
     "./moments.css?v=4",
-    "./moments.js?v=4",
+    "./moments.js?v=5",
+    "./foundation.js?v=5",
+    "./photos.js?v=5",
+    "./together.js?v=5",
+    "./together.css?v=5",
     "./config.js",
     "./manifest.webmanifest",
     "./assets/icons/amor-favicon-32.png",

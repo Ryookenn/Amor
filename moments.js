@@ -337,8 +337,8 @@
             actions.append(button('Modifier',()=>openFragment(item),'mom-quiet'));
             const options=el('details',null,'mom-note-more');options.append(el('summary','Plus'));
             options.append(button('Supprimer ce fragment…',async()=>{
-                if(!confirm(`Supprimer définitivement « ${item.title} » ?`))return;
-                const {error}=await supabaseClient.from('memory_fragments').delete().eq('id',item.id);
+                if(!confirm(`Mettre « ${item.title} » à la corbeille ?`))return;
+                const {error}=await amorTrashQuery("memory_fragments").eq('id',item.id);
                 if(error){errorBox(card,'Le fragment n’a pas été supprimé. Réessayez.');return;}
                 indexDirty=true;await loadStayFragments();
             },'mom-quiet'));
@@ -385,8 +385,8 @@
             }
             const value={city_id:c.dest.id,stay_id:c.stay,title:$('#mom-fragment-title').value.trim(),content:$('#mom-fragment-content').value.trim(),happened_on:$('#mom-fragment-date').value||null};
             if(!value.title){$('#mom-fragment-message').textContent='Ajoutez un titre au fragment.';return;}
-            const req=c.item?supabaseClient.from('memory_fragments').update(value).eq('id',c.item.id):supabaseClient.from('memory_fragments').insert(value);
-            const {error}=await req.select().single();if(error)throw error;
+            const req=c.item?supabaseClient.from('memory_fragments').update({...value,revision:c.item.revision}).eq('id',c.item.id):supabaseClient.from('memory_fragments').insert(value);
+            const {error}=await req.select().single();if(error){amorConflict(error);throw error;}
             if(fragmentDraftKey){try{localStorage.removeItem(fragmentDraftKey);}catch{}}
             fragmentChanged=false;fragmentEditor.d.close();indexDirty=true;await loadStayFragments();
             emit('amor:moment-saved');
@@ -484,9 +484,11 @@
         try {
             const value={scope_key:c.key,city_id:c.dest.id,stay_id:c.stay,storage_path:selectedPhoto.storage_path,
                 position_x:Number($('#mom-crop-x').value),position_y:Number($('#mom-crop-y').value)};
-            const {error}=await supabaseClient.from('memory_covers').upsert(value);
-            if(error) throw error;
-            preferences.set(c.key,value);emit('amor:refresh-covers');coverEditor.d.close();
+            const existing=preferences.get(c.key);
+            const req=existing?supabaseClient.from('memory_covers').update({...value,revision:existing.revision}).eq('scope_key',c.key):supabaseClient.from('memory_covers').insert(value);
+            const {data:saved,error}=await req.select().single();
+            if(error){amorConflict(error);throw error;}
+            preferences.set(c.key,saved);emit('amor:refresh-covers');coverEditor.d.close();
             refreshCardCovers().catch(()=>{});
         } catch { $('#mom-cover-message').textContent='Couverture non enregistrée. Vérifiez la connexion et que le script SQL V4 a été exécuté, puis réessayez.'; }
         finally {saveCover.disabled=false;saveCover.removeAttribute('aria-busy');}
@@ -537,7 +539,7 @@
         const {data,error}=await supabaseClient.from('memory_covers').select('*');
         if(error || account!==userId) return;
         if(!data.length) return;
-        const {data:links,error:linkError}=await supabaseClient.storage.from('memories').createSignedUrls(data.map(p=>p.storage_path),3600);
+        const {data:links,error:linkError}=await amorCoverLinks(data);
         if(linkError || account!==userId || !$('#auth-screen').hidden) return;
         data.forEach((p,i)=>{
             const url=links[i]?.signedUrl;if(!url)return;

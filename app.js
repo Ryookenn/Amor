@@ -102,9 +102,12 @@ async function chargerDestinationsDepuisSupabase() {
             longitude,
             region,
             department,
+            country_code,
+            country_name,
             experience_type,
             home_owner,
             home_pages (
+                revision,
                 tagline,
                 introduction,
                 updated_at
@@ -118,6 +121,8 @@ async function chargerDestinationsDepuisSupabase() {
                 maena_rating,
                 stay_media (
                     storage_path,
+                    display_path,
+                    thumb_path,
                     media_type,
                     created_at
                 )
@@ -246,6 +251,9 @@ async function chargerDestinationsDepuisSupabase() {
                 departement:
                     villeSupabase.department,
 
+                countryCode: villeSupabase.country_code || 'fr',
+                countryName: villeSupabase.country_name || 'France',
+
                 experienceType:
                     villeSupabase.experience_type ??
                     "travel",
@@ -315,7 +323,7 @@ async function chargerDestinationsDepuisSupabase() {
                     null,
 
                 cheminPhotoPrincipale:
-                    photos[0]?.storage_path ??
+                    photos[0]?.display_path ?? photos[0]?.storage_path ??
                     null,
 
                 urlPhotoPrincipale:
@@ -769,7 +777,7 @@ function actualiserStatistiques() {
 
     const nombreRegions =
                new Set(
-            destinations.map(
+            destinations.filter(d=>d.countryCode==='fr').map(
                 function(destination) {
 
                     return destination.region;
@@ -781,7 +789,7 @@ function actualiserStatistiques() {
 
     const nombreDepartements =
         new Set(
-            destinations.map(
+            destinations.filter(d=>d.countryCode==='fr').map(
                 function(destination) {
 
                     return destination.departement;
@@ -1641,6 +1649,8 @@ function ligneSupabaseVersSouvenirs(ligne) {
         id:
             ligne.id,
 
+        revision: ligne.revision,
+
         dateDebut:
             ligne.date_start ?? "",
 
@@ -1798,7 +1808,7 @@ async function enregistrerSejour(
             error
         } = await supabaseClient
             .from("stays")
-            .update(ligne)
+            .update({...ligne, revision:souvenirs.revision})
             .eq("id", souvenirs.id)
             .select()
             .single();
@@ -2505,9 +2515,7 @@ async function envoyerPhotos(
 
         if (mediasCrees.length > 0) {
 
-            await supabaseClient
-                .from("stay_media")
-                .delete()
+            await amorTrashQuery("stay_media")
                 .in("id", mediasCrees);
 
         }
@@ -2515,10 +2523,7 @@ async function envoyerPhotos(
 
         if (cheminsEnvoyes.length > 0) {
 
-            await supabaseClient
-                .storage
-                .from("memories")
-                .remove(
+            await amorSafeRemove(
                     cheminsEnvoyes
                 );
 
@@ -2797,7 +2802,7 @@ async function supprimerPhoto(
 
     const confirmation =
         window.confirm(
-            "Supprimer définitivement cette photo du séjour ?"
+            "Mettre cette photo du séjour à la corbeille ?"
         );
 
 
@@ -2813,9 +2818,7 @@ async function supprimerPhoto(
 
         const {
             error: erreurLigne
-        } = await supabaseClient
-            .from("stay_media")
-            .delete()
+        } = await amorTrashQuery("stay_media")
             .eq("id", media.id);
 
 
@@ -2826,10 +2829,7 @@ async function supprimerPhoto(
 
         const {
             error: erreurFichier
-        } = await supabaseClient
-            .storage
-            .from("memories")
-            .remove([
+        } = await amorSafeRemove([
                 media.storage_path
             ]);
 
@@ -3192,10 +3192,7 @@ async function envoyerAudio(
 
     if (erreurMedia) {
 
-        await supabaseClient
-            .storage
-            .from("memories")
-            .remove([chemin]);
+        await amorSafeRemove([chemin]);
 
         throw erreurMedia;
 
@@ -3410,7 +3407,7 @@ async function supprimerAudio(
 
     const confirmation =
         window.confirm(
-            "Supprimer définitivement ce vocal du séjour ?"
+            "Mettre ce vocal du séjour à la corbeille ?"
         );
 
 
@@ -3426,9 +3423,7 @@ async function supprimerAudio(
 
         const {
             error: erreurLigne
-        } = await supabaseClient
-            .from("stay_media")
-            .delete()
+        } = await amorTrashQuery("stay_media")
             .eq("id", media.id);
 
 
@@ -3439,10 +3434,7 @@ async function supprimerAudio(
 
         const {
             error: erreurFichier
-        } = await supabaseClient
-            .storage
-            .from("memories")
-            .remove([
+        } = await amorSafeRemove([
                 media.storage_path
             ]);
 
@@ -3735,8 +3727,8 @@ boutonSupprimerVille.addEventListener(
 
         const confirmation =
             window.confirm(
-                `Supprimer définitivement ${villeASupprimer.ville}, ` +
-                "tous ses séjours, ses photos et ses vocaux ?"
+                `Mettre ${villeASupprimer.ville}, ` +
+                "ses séjours, ses photos et ses vocaux à la corbeille ?"
             );
 
 
@@ -3824,9 +3816,7 @@ boutonSupprimerVille.addEventListener(
 
             const {
                 error: erreurVille
-            } = await supabaseClient
-                .from("cities")
-                .delete()
+            } = await amorTrashQuery("cities")
                 .eq(
                     "id",
                     villeASupprimer.id
@@ -3844,10 +3834,7 @@ boutonSupprimerVille.addEventListener(
 
                 const {
                     error: erreurFichiers
-                } = await supabaseClient
-                    .storage
-                    .from("memories")
-                    .remove(
+                } = await amorSafeRemove(
                         cheminsMedias
                     );
 
@@ -4140,6 +4127,7 @@ souvenirForm.addEventListener(
                 "Enregistrement impossible :",
                 erreur
             );
+            amorConflict(erreur);
 
             souvenirMessage.textContent =
                 "La sauvegarde en ligne a échoué. " +
@@ -4219,7 +4207,7 @@ boutonSupprimerSejour.addEventListener(
 
         const confirmation =
             window.confirm(
-                `Supprimer définitivement le séjour ${numero} à ${destinationActive.ville} ?`
+                `Mettre le séjour ${numero} à ${destinationActive.ville} à la corbeille ?`
             );
 
 
@@ -4238,9 +4226,7 @@ boutonSupprimerSejour.addEventListener(
 
                 const {
                     error
-                } = await supabaseClient
-                    .from("stays")
-                    .delete()
+                } = await amorTrashQuery("stays")
                     .eq(
                         "id",
                         sejourASupprimer.id
@@ -5365,6 +5351,7 @@ async function chargerPremieresFois() {
     } = await supabaseClient
         .from("first_times")
         .select(`
+            revision,
             id,
             title,
             description,
@@ -6530,7 +6517,7 @@ premiereFoisForm.addEventListener(
                 const resultat =
                     await supabaseClient
                         .from("first_times")
-                        .update(donnees)
+                        .update({...donnees,revision:premieresFois.find(p=>String(p.id)===String(identifiant))?.revision})
                         .eq(
                             "id",
                             identifiant
@@ -6714,7 +6701,7 @@ async function supprimerPremiereFois(
 
     const confirmation =
         window.confirm(
-            `Supprimer « ${premiereFois.title} » de votre liste ?`
+            `Mettre « ${premiereFois.title} » à la corbeille ?`
         );
 
 
@@ -6727,9 +6714,7 @@ async function supprimerPremiereFois(
 
         const {
             error
-        } = await supabaseClient
-            .from("first_times")
-            .delete()
+        } = await amorTrashQuery("first_times")
             .eq(
                 "id",
                 premiereFois.id
@@ -6993,7 +6978,7 @@ function convertirResultatGeographique(
     const departement =
         adresse.county ||
         adresse.state_district ||
-        "Département non identifié";
+        (adresse.country_code==='fr' ? "Département non identifié" : (adresse.country || ''));
 
 
     const codeIsoDepartement =
@@ -7009,7 +6994,7 @@ function convertirResultatGeographique(
     return {
 
         id:
-            creerIdentifiantVille(
+            (adresse.country_code && adresse.country_code!=='fr') ? `${adresse.country_code}-osm-${resultat.osm_type}-${resultat.osm_id}` : creerIdentifiantVille(
                 nom,
                 codeDepartement,
                 resultat.osm_id
@@ -7017,6 +7002,9 @@ function convertirResultatGeographique(
 
         ville:
             nom,
+
+        countryCode: adresse.country_code || '',
+        countryName: adresse.country || '',
 
         latitude:
             Number(resultat.lat),
@@ -7090,7 +7078,7 @@ function afficherResultatsVilles(
     if (villes.length === 0) {
 
         resultatsVilles.textContent =
-            "Aucune commune française trouvée.";
+            "Aucune ville trouvée. Essayez en précisant le pays.";
 
         return;
 
@@ -7196,7 +7184,7 @@ async function rechercherCommune() {
         new URLSearchParams({
 
             q:
-                `${nomRecherche}, France`,
+                nomRecherche,
 
             format:
                 "jsonv2",
@@ -7206,9 +7194,6 @@ async function rechercherCommune() {
 
             limit:
                 "5",
-
-            countrycodes:
-                "fr",
 
             featureType:
                 "settlement",
@@ -7222,7 +7207,7 @@ async function rechercherCommune() {
     try {
 
         const reponse =
-            await fetch(
+            await amorGeoFetch(
                 "https://nominatim.openstreetmap.org/search?" +
                 parametres.toString()
             );
@@ -7423,7 +7408,9 @@ ajoutVilleForm.addEventListener(
                 villeCandidateSelectionnee.region,
 
             department:
-                villeCandidateSelectionnee.departement
+                villeCandidateSelectionnee.departement,
+            country_code: villeCandidateSelectionnee.countryCode,
+            country_name: villeCandidateSelectionnee.countryName
 
         };
 
@@ -7483,9 +7470,7 @@ ajoutVilleForm.addEventListener(
 
             // Annule la création incomplète de la ville.
 
-            await supabaseClient
-                .from("cities")
-                .delete()
+            await amorTrashQuery("cities")
                 .eq(
                     "id",
                     nouvelleVille.id
@@ -7762,7 +7747,7 @@ async function chargerProfilHome(destination) {
 
     const { data, error } = await supabaseClient
         .from("home_pages")
-        .select("city_id, tagline, introduction, updated_at")
+        .select("city_id, tagline, introduction, updated_at, revision")
         .eq("city_id", destination.id)
         .maybeSingle();
 
@@ -7918,26 +7903,21 @@ async function obtenirSejourSupportHome(destination) {
 
 async function supprimerPhotoHome(media, bouton) {
 
-    if (!window.confirm("Supprimer définitivement cette photo de notre album ?")) {
+    if (!window.confirm("Mettre cette photo de notre album à la corbeille ?")) {
         return;
     }
 
     bouton.disabled = true;
 
     try {
-        const { error } = await supabaseClient
-            .from("stay_media")
-            .delete()
+        const { error } = await amorTrashQuery("stay_media")
             .eq("id", media.id);
 
         if (error) {
             throw error;
         }
 
-        const { error: erreurFichier } = await supabaseClient
-            .storage
-            .from("memories")
-            .remove([media.storage_path]);
+        const { error: erreurFichier } = await amorSafeRemove([media.storage_path]);
 
         if (erreurFichier) {
             console.warn("Nettoyage du fichier impossible :", erreurFichier);
@@ -7959,7 +7939,7 @@ async function chargerItemsHome(destination) {
 
     const { data, error } = await supabaseClient
         .from("home_items")
-        .select("id, city_id, item_type, title, content, happened_on, sort_order, created_at")
+        .select("id, city_id, item_type, title, content, happened_on, sort_order, created_at, revision")
         .eq("city_id", destination.id)
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false });
@@ -7984,6 +7964,7 @@ function afficherItemsHome() {
 
             const carte = document.createElement("article");
             carte.className = `home-item ${item.item_type}`;
+            carte.dataset.itemId = item.id;
 
             const meta = document.createElement("p");
             meta.className = "home-item-meta";
@@ -8048,6 +8029,7 @@ function ouvrirFormulaireHomeItem(item = null) {
     fermerFormulaireHomeItem();
     homeItemForm.hidden = false;
     ajouterHomeItem.hidden = true;
+    homeItemForm.dataset.revision = item?.revision || '';
 
     if (item) {
         homeItemId.value = item.id;
@@ -8063,13 +8045,11 @@ function ouvrirFormulaireHomeItem(item = null) {
 
 async function supprimerHomeItem(item) {
 
-    if (!window.confirm(`Supprimer « ${item.title} » ?`)) {
+    if (!window.confirm(`Mettre « ${item.title} » à la corbeille ?`)) {
         return;
     }
 
-    const { error } = await supabaseClient
-        .from("home_items")
-        .delete()
+    const { error } = await amorTrashQuery("home_items")
         .eq("id", item.id);
 
     if (error) {
@@ -8194,11 +8174,12 @@ homeProfilForm.addEventListener("submit", async function(event) {
 
     const { data, error } = await supabaseClient
         .from("home_pages")
-        .upsert(donnees, { onConflict: "city_id" })
-        .select("city_id, tagline, introduction, updated_at")
+        .upsert({...donnees,revision:homeActif.homePage?.revision || 1}, { onConflict: "city_id" })
+        .select("city_id, tagline, introduction, updated_at, revision")
         .single();
 
     if (error) {
+        amorConflict(error);
         window.alert("La présentation n’a pas pu être enregistrée.");
         return;
     }
@@ -8319,7 +8300,7 @@ homeItemForm.addEventListener("submit", async function(event) {
     if (id) {
         requete = supabaseClient
             .from("home_items")
-            .update(donnees)
+            .update({...donnees,revision:Number(homeItemForm.dataset.revision)})
             .eq("id", id);
     } else {
         requete = supabaseClient
@@ -8332,6 +8313,7 @@ homeItemForm.addEventListener("submit", async function(event) {
     if (error) {
         homeItemMessage.textContent =
             `Enregistrement impossible : ${error.message}`;
+        amorConflict(error);
         return;
     }
 
