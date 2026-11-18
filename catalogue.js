@@ -5,7 +5,7 @@
  const library=D('Notre photothèque'),journeys=D('Nos voyages'),journeyEditor=D('Les étapes du voyage',true),album=D('Organiser cet album',true);
  const shortcuts=$('.v5-shortcuts');shortcuts.prepend(B('Photothèque',()=>openLibrary()),B('Nos voyages',openJourneys));
  const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
- async function getData(){data=await S.snapshot(true);return data;}
+ async function getData(){data=await S.snapshot();return data;}
  async function sign(media){const paths=[...new Set(media.flatMap(m=>[m.thumb_path||m.display_path||m.storage_path,m.display_path||m.storage_path]))];
   const map=new Map();for(let i=0;i<paths.length;i+=100){const batch=paths.slice(i,i+100);const {data,error}=await supabaseClient.storage.from('memories').createSignedUrls(batch,3600);if(error)throw error;batch.forEach((p,j)=>map.set(p,data[j]?.signedUrl));}return map;}
  function mediaContext(m){const stay=data.stays.find(s=>String(s.id)===String(m.stay_id));return {stay,city:data.cities.find(c=>String(c.id)===String(stay?.city_id))};}
@@ -63,7 +63,7 @@
   const grid=E('div',null,'v6-city-grid');list.append(query,countries,grid);
   const chips=E('div',null,'v7-chips');grid.before(chips);
   function cards(){cityQuery=query.value;countryFilter=countries.value;grid.replaceChildren();chips.replaceChildren();if(cityQuery)chips.append(M.button(cityQuery+' · Retirer',()=>{query.value='';cards();},'close'));if(countryFilter)chips.append(M.button(countries.selectedOptions[0].textContent+' · Retirer',()=>{countries.value='';cards();},'close'));if(chips.children.length)chips.append(M.button('Tout réinitialiser',()=>{query.value='';countries.value='';cards();},'undo'));
-   destinations.filter(d=>(!countryFilter||d.countryCode===countryFilter)&&normalize(d.ville).includes(normalize(cityQuery))).forEach(d=>{const card=B('',()=>M.visit(null,()=>ouvrirFiche(d),'la liste'),'v6-city-card');if(d.urlPhotoPrincipale)card.append(M.image(d.urlPhotoPrincipale,'','4/3'));card.append(E('strong',d.ville),E('small',d.experienceType==='home'?'Notre chez-nous':d.countryName),E('span',d.experienceType==='home'?'Page permanente':`${d.nombreSejours} séjour(s)`));grid.append(card);});if(!grid.children.length)grid.append(E('p','Aucune destination avec ces filtres.'));}
+   destinations.filter(d=>(!countryFilter||d.countryCode===countryFilter)&&normalize(d.ville).includes(normalize(cityQuery))).forEach(d=>{const card=B('',()=>M.visit(null,()=>ouvrirFiche(d),'la liste'),'v6-city-card');card.dataset.cityId=d.id;if(d.urlPhotoPrincipale)card.append(M.image(d.urlPhotoPrincipale,'','4/3'));card.append(E('strong',d.ville),E('small',d.experienceType==='home'?'Notre chez-nous':d.countryName),E('span',d.experienceType==='home'?'Page permanente':`${d.nombreSejours} séjour(s)`));grid.append(card);});if(!grid.children.length)grid.append(E('p','Aucune destination avec ces filtres.'));}
   query.oninput=cards;countries.onchange=cards;cards();
  }
  document.addEventListener('amor:data-ready',()=>{if(!list.hidden)renderDestinations();});

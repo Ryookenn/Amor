@@ -59,7 +59,7 @@
         galeriePhotos.replaceChildren();mediasPhotosActifs=[];photosAffichees=[];photosVides.hidden=false;photosExistantesEdition.replaceChildren();
         if(!stay.id)return;
         try{
-            const {data,error}=await supabaseClient.from('stay_media').select('id,stay_id,storage_path,thumb_path,display_path,original_name,original_kept,caption,sort_order,in_mosaic,revision,upload_key').eq('stay_id',stay.id).eq('media_type','photo').order('sort_order').order('created_at');
+            const {data,error}=await supabaseClient.from('stay_media').select('id,stay_id,storage_path,thumb_path,display_path,original_name,original_kept,caption,sort_order,in_mosaic,revision,upload_key,response_key').eq('stay_id',stay.id).eq('media_type','photo').order('sort_order').order('created_at');
             if(error)throw error;
             const links=await signed(data);
             if(ticket!==stayRequest||String(souvenirsActifs.id)!==String(stay.id))return;

@@ -7,11 +7,14 @@
  function modal(title){const d=node('dialog',null,'v5-dialog'),h=node('header'),c=node('div',null,'v5-content');const heading=node('h2',title);heading.id='v5-'+crypto.randomUUID();d.setAttribute('aria-labelledby',heading.id);h.append(heading,b('Fermer',()=>d.close(),'v5-quiet'));d.append(h,c);document.body.append(d);return {d,c};}
  function failure(parent,error,retry){const box=node('div',null,'v5-error');box.setAttribute('role','alert');box.append(node('p',error?.code==='40001'?'Ce contenu a changé sur un autre appareil. Rechargez-le avant de réessayer.':error?.message||String(error)));if(retry)box.append(b('Réessayer',()=>{box.remove();retry();}));parent.append(box);amorConflict(error);}
  async function run(button,fn,parent){if(button.disabled)return;button.disabled=true;button.setAttribute('aria-busy','true');try{await fn();}catch(e){failure(parent,e);}finally{button.disabled=false;button.removeAttribute('aria-busy');}}
- let cache=null,cacheTime=0,accountTicket=0;
- function invalidate(){cache=null;cacheTime=0;}
+ let cache=null,cacheTime=0,accountTicket=0,pendingSnapshot=null,cacheGeneration=0;
+ function invalidate(){cache=null;cacheTime=0;cacheGeneration++;pendingSnapshot=null;}
  async function snapshot(force=false){if(!S.uid)throw Error('Connectez-vous pour retrouver votre histoire.');if(!force&&cache&&Date.now()-cacheTime<15000)return cache;
-  const ticket=accountTicket;const {data,error}=await supabaseClient.rpc('amor_backup');if(error)throw error;
-  if(ticket!==accountTicket)throw Error('La session a changé.');cache=data;cacheTime=Date.now();return data;}
+  if(pendingSnapshot)return pendingSnapshot;
+  const ticket=accountTicket,generation=cacheGeneration;
+  const task=(async()=>{const {data,error}=await supabaseClient.rpc('amor_backup');if(error)throw error;
+   if(ticket!==accountTicket)throw Error('La session a changé.');if(generation===cacheGeneration){cache=data;cacheTime=Date.now();}return data;})();
+  pendingSnapshot=task;try{return await task;}finally{if(pendingSnapshot===task)pendingSnapshot=null;}}
  async function refresh(){invalidate();await chargerDestinationsDepuisSupabase();await chargerPremieresFois();document.dispatchEvent(new CustomEvent('amor:refresh-covers'));}
  ['amor:saved','amor:moment-saved','amor:home-saved','amor:badge','amor:trashed'].forEach(event=>document.addEventListener(event,invalidate));
  function live(data,table,row){

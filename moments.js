@@ -347,8 +347,7 @@
             actions.append(button('Modifier',()=>openFragment(item),'mom-quiet'));
             const options=el('details',null,'mom-note-more');options.append(el('summary','Plus'));
             options.append(button('Supprimer ce fragment…',async()=>{
-                if(!confirm(`Mettre « ${item.title} » à la corbeille ?`))return;
-                const {error}=await amorTrashQuery("memory_fragments").eq('id',item.id);
+                const {error}=await amorTrashQuery("memory_fragments",{undo:true}).eq('id',item.id);
                 if(error){errorBox(card,'Le fragment n’a pas été supprimé. Réessayez.');return;}
                 indexDirty=true;await loadStayFragments();
             },'mom-quiet'));
@@ -373,6 +372,7 @@
         }catch{}
         fragmentEditor.d.showModal();$('#mom-fragment-title').focus();
     }
+    window.AmorDraftTools={openFragment,offerStay:offerDraft};
     fragmentForm.addEventListener('input',()=>{
         fragmentChanged=true;
         if(fragmentDraftKey){try{localStorage.setItem(fragmentDraftKey,JSON.stringify({time:Date.now(),title:$('#mom-fragment-title').value,content:$('#mom-fragment-content').value,date:$('#mom-fragment-date').value}));}catch{}}
@@ -622,14 +622,16 @@
         return async function wrapped(dest,...args){
             openingCount++;if(!opening.d.open)opening.d.showModal();
             const expected=$(home||dest.experienceType==='home'?'#home-dialog':'#souvenir-dialog');
+            let wasOpened=expected.open;const openedObserver=new MutationObserver(()=>{if(expected.open)wasOpened=true;});openedObserver.observe(expected,{attributes:true,attributeFilter:['open']});
             try{await old(dest,...args);}
             catch(error){console.warn('Ouverture temporairement indisponible.',error);}
             finally{
+                openedObserver.disconnect();
                 openingCount--;
                 if(!$('#auth-screen').hidden){expected.close();opening.d.close();return;}
                 if(openingCount===0){
                     opening.d.close();
-                    if(!expected.open){
+                    if(!expected.open&&!wasOpened){
                         recovery.content.replaceChildren();
                         errorBox(recovery.content,'Cette fiche n’a pas pu être ouverte. Vos données ne sont pas perdues.',()=>{recovery.d.close();wrapped(dest,...args);});
                         recovery.d.showModal();

@@ -1574,7 +1574,7 @@ function sejourContientDesDonnees(souvenirs) {
         maena.note !== undefined &&
         maena.note !== "" ||
         souvenirs.phraseCommune ||
-        souvenirs.musique
+        souvenirs.musique || souvenirs.musiqueLien
     );
 
 }
@@ -1633,7 +1633,10 @@ function souvenirsVersLigneSupabase(
             souvenirs.phraseCommune || null,
 
         music:
-            souvenirs.musique || null
+            souvenirs.musique || null,
+
+        music_url:
+            souvenirs.musiqueLien || null
 
     };
 
@@ -1697,7 +1700,10 @@ function ligneSupabaseVersSouvenirs(ligne) {
             ligne.shared_quote ?? "",
 
         musique:
-            ligne.music ?? ""
+            ligne.music ?? "",
+
+        musiqueLien:
+            ligne.music_url ?? ""
 
     };
 
@@ -2144,6 +2150,7 @@ function afficherSouvenirs(souvenirs) {
     remplirReponse(
         "vue-musique",
         souvenirs.musique
+        || souvenirs.musiqueLien
     );
 
     afficherBadgesPremieresFois(
@@ -2228,6 +2235,8 @@ function remplirFormulaire(souvenirs) {
         "fiche-musique",
         souvenirs.musique
     );
+
+    remplirChamp("fiche-musique-lien", souvenirs.musiqueLien);
 
 
     actualiserRepereEdition();
@@ -3684,14 +3693,6 @@ async function ouvrirFiche(
         souvenirsActifs
     );
 
-    await chargerPhotos(
-        souvenirsActifs
-    );
-
-    await chargerAudio(
-        souvenirsActifs
-    );
-
     afficherModeConsultation();
 
 
@@ -3701,6 +3702,16 @@ async function ouvrirFiche(
     document.body.classList.add(
         "fiche-ouverte"
     );
+
+    souvenirDialog.setAttribute("aria-busy", "true");
+    try {
+        await Promise.all([chargerPhotos(souvenirsActifs), chargerAudio(souvenirsActifs)]);
+    } finally {
+        souvenirDialog.removeAttribute("aria-busy");
+    }
+    if (souvenirDialog.open && destinationActive?.id === destination.id) {
+        document.dispatchEvent(new CustomEvent("amor:record-ready"));
+    }
 
 }
 
@@ -4027,7 +4038,10 @@ souvenirForm.addEventListener(
                 lireChamp("fiche-phrase-commune"),
 
             musique:
-                lireChamp("fiche-musique")
+                lireChamp("fiche-musique"),
+
+            musiqueLien:
+                lireChamp("fiche-musique-lien")
 
         };
 
@@ -6698,23 +6712,11 @@ async function corrigerPremiereFois(
 async function supprimerPremiereFois(
     premiereFois
 ) {
-
-    const confirmation =
-        window.confirm(
-            `Mettre « ${premiereFois.title} » à la corbeille ?`
-        );
-
-
-    if (!confirmation) {
-        return;
-    }
-
-
     try {
 
         const {
             error
-        } = await amorTrashQuery("first_times")
+        } = await amorTrashQuery("first_times", {undo:true})
             .eq(
                 "id",
                 premiereFois.id
@@ -8010,12 +8012,7 @@ function ouvrirFormulaireHomeItem(item = null) {
 
 
 async function supprimerHomeItem(item) {
-
-    if (!window.confirm(`Mettre « ${item.title} » à la corbeille ?`)) {
-        return;
-    }
-
-    const { error } = await amorTrashQuery("home_items")
+    const { error } = await amorTrashQuery("home_items", {undo:true})
         .eq("id", item.id);
 
     if (error) {
@@ -8293,6 +8290,7 @@ function fermerFicheHome() {
     if (!homeDialog.open) {
         return;
     }
+    if (window.AmorComfort && !window.AmorComfort.mayCloseHome()) return;
     homeDialog.close();
     homeActif = null;
     document.body.classList.remove("fiche-ouverte");

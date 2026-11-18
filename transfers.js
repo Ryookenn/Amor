@@ -41,7 +41,7 @@
      const keep=S.keepOriginals||!display,main=keep?file:display,stem=`${destination.id}/${stay.id}/${crypto.randomUUID()}`;
      const path=stem+'-'+(keep?nettoyerNomFichier(file.name):'photo.'+extension(main)),thumbPath=thumb?stem+'-thumb.'+extension(thumb):null,displayPath=display?(keep?stem+'-screen.'+extension(display):path):null;
      const parts=[{path,blob:main,done:false}];if(thumb)parts.push({path:thumbPath,blob:thumb,done:false});if(display&&keep)parts.push({path:displayPath,blob:display,done:false});
-     job={uid,parts,row:{stay_id:stay.id,media_type:'photo',storage_path:path,thumb_path:thumbPath,display_path:displayPath,original_name:file.name,original_kept:keep,upload_key:key,sort_order:position++}};jobs.set(key,job);
+     job={uid,file,city:destination.id,parts,row:{stay_id:stay.id,media_type:'photo',storage_path:path,thumb_path:thumbPath,display_path:displayPath,original_name:file.name,original_kept:keep,upload_key:key,sort_order:position++}};jobs.set(key,job);
     }
     const total=job.parts.reduce((n,p)=>n+p.blob.size,0);
     for(const part of job.parts){if(part.done)continue;if(cancelled)throw Error('Envoi annulé.');
@@ -56,18 +56,18 @@
    }
    status.textContent='Toutes les photos sont enregistrées.';cancel.disabled=true;setTimeout(()=>{if(!working)panel.hidden=true;},1800);
   }catch(error){status.textContent=error.message+($('#home-dialog').open?' Resélectionnez les mêmes photos pour reprendre les restantes.':' Réenregistrez la fiche pour reprendre uniquement les photos restantes.');throw error;}
-  finally{working=false;V.uploading=false;cancel.disabled=true;}
+  finally{working=false;V.uploading=false;cancel.disabled=true;document.dispatchEvent(new CustomEvent('amor:transfer-state'));}
  };
  window.addEventListener('beforeunload',event=>{if(working){event.preventDefault();event.returnValue='';}});
  envoyerAudio=async function(file,stay,destination){
   if(working)throw Error('Un envoi est déjà en cours.');working=true;V.uploading=true;cancelled=false;cancel.disabled=false;$('#souvenir-dialog').append(panel);panel.hidden=false;progress.value=0;
   try{const key=String(stay.id)+':audio:'+await digest(file);const {data:existing,error}=await supabaseClient.from('stay_media').select('id').eq('upload_key',key).maybeSingle();if(error)throw error;
-   if(!existing){let job=jobs.get(key);if(!job){const path=`${destination.id}/${stay.id}/audio/${crypto.randomUUID()}-${nettoyerNomFichier(file.name)}`;job={uid:S.uid,parts:[{path,blob:file,done:false}],row:{stay_id:stay.id,media_type:'audio',storage_path:path,original_name:file.name,upload_key:key}};jobs.set(key,job);}
+   if(!existing){let job=jobs.get(key);if(!job){const path=`${destination.id}/${stay.id}/audio/${crypto.randomUUID()}-${nettoyerNomFichier(file.name)}`;job={uid:S.uid,file,city:destination.id,parts:[{path,blob:file,done:false}],row:{stay_id:stay.id,media_type:'audio',storage_path:path,original_name:file.name,upload_key:key}};jobs.set(key,job);}
     status.textContent='Envoi du vocal : '+file.name;const part=job.parts[0];if(!part.done){await upload(part.path,part.blob,ratio=>progress.value=Math.round(ratio*100));part.done=true;}
     const {error}=await supabaseClient.from('stay_media').insert(job.row);if(error){const {data:confirmed}=await supabaseClient.from('stay_media').select('id').eq('upload_key',key).maybeSingle();if(!confirmed)throw error;}jobs.delete(key);
    }status.textContent='Vocal enregistré.';progress.value=100;setTimeout(()=>{if(!working)panel.hidden=true;},1800);
   }catch(error){status.textContent=error.message+' Réenregistrez la fiche pour reprendre le vocal.';throw error;}
-  finally{working=false;V.uploading=false;cancel.disabled=true;}
+  finally{working=false;V.uploading=false;cancel.disabled=true;document.dispatchEvent(new CustomEvent('amor:transfer-state'));}
  };
  new MutationObserver(()=>{if($('#auth-screen').hidden)return;cancelled=true;xhr?.abort();jobs.clear();panel.hidden=true;}).observe($('#auth-screen'),{attributes:true,attributeFilter:['hidden']});
  const cleanup=B('Nettoyer mes envois partiels',()=>run(cleanup,async()=>{
@@ -75,11 +75,11 @@
   for(const job of jobs.values()){const {error}=await amorSafeRemove(job.parts.filter(p=>p.done).map(p=>p.path));if(error)throw error;}jobs.clear();panel.hidden=true;
  },V.settings.c),'v6-quiet');V.settings.c.append(cleanup);
 
- // Lecteur ZIP borné : archives AMOR produites en mode non compressé par V5/V6/V8.
+ // Lecteur ZIP borné : archives AMOR produites en mode non compressé par V5/V6/V8/V9.
  async function readZip(file){if(file.size>320*1024*1024)throw Error('Archive de 320 Mo maximum ; importez par séjour.');const buffer=await file.arrayBuffer(),view=new DataView(buffer),bytes=new Uint8Array(buffer),entries=new Map();let at=0;
   while(at+4<=bytes.length&&view.getUint32(at,true)===0x04034b50){
    if(at+30>bytes.length)throw Error('Archive tronquée.');const flags=view.getUint16(at+6,true),method=view.getUint16(at+8,true),crc=view.getUint32(at+14,true),size=view.getUint32(at+18,true),nameSize=view.getUint16(at+26,true),extra=view.getUint16(at+28,true);
-   if(method!==0||(flags&8))throw Error('Utilisez un ZIP AMOR V5/V6/V8 non recompressé.');const name=new TextDecoder().decode(bytes.subarray(at+30,at+30+nameSize));const start=at+30+nameSize+extra,end=start+size;if(end>bytes.length)throw Error('Archive tronquée.');
+   if(method!==0||(flags&8))throw Error('Utilisez un ZIP AMOR V5/V6/V8/V9 non recompressé.');const name=new TextDecoder().decode(bytes.subarray(at+30,at+30+nameSize));const start=at+30+nameSize+extra,end=start+size;if(end>bytes.length)throw Error('Archive tronquée.');
    if(name.split('/').includes('..')||name.startsWith('/')||name.includes(String.fromCharCode(92))||entries.has(name))throw Error('Chemin d’archive invalide.');const payload=bytes.subarray(start,end);if(amorCrc(payload)!==crc)throw Error('Un fichier est corrompu dans le ZIP.');entries.set(name,new Blob([payload]));at=end;
   }if(!entries.size)throw Error('Archive AMOR vide ou non reconnue.');return entries;
  }
@@ -90,7 +90,7 @@
    const file=$('#v6-import-file').files[0];if(!file)throw Error('Choisissez une sauvegarde.');let entries=null,json;
    if(/\.zip$/i.test(file.name)){entries=await readZip(file);const meta=entries.get('AMOR-sauvegarde.json');if(!meta)throw Error('JSON de sauvegarde absent du ZIP.');json=JSON.parse(await meta.text());}
    else{if(file.size>12*1024*1024)throw Error('JSON de 12 Mo maximum.');json=JSON.parse(await file.text());}
-   if(![5,6,8].includes(json.schema_version))throw Error('Sauvegarde V5, V6 ou V8 attendue.');
+   if(![5,6,8,9].includes(json.schema_version))throw Error('Sauvegarde V5, V6, V8 ou V9 attendue.');
    const {data:report,error}=await supabaseClient.rpc('amor_import',{p_data:json,p_apply:false});if(error)throw error;
    const parent=$('#v6-import-report');parent.replaceChildren(E('h3','Aperçu'),E('p',`${report.missing} ligne(s) manquante(s), ${report.existing_unchanged} ligne(s) existante(s) conservée(s).`));
    for(const [table,count]of Object.entries(report.tables))parent.append(E('p',`${table} : ${count} ajout(s) possible(s)`));
@@ -114,4 +114,6 @@
   },restore.c));restore.c.append(preview);restore.d.showModal();
  }
  V.readZip=readZip;
+ V.pendingTransfers=()=>[...jobs].filter(([,j])=>j.uid===S.uid&&j.file).map(([key,j])=>({key,name:j.row.original_name,city:j.city,stay:j.row.stay_id}));
+ V.resumeTransfer=async key=>{const job=jobs.get(key);if(!job||job.uid!==S.uid)throw Error('Cet envoi n’est plus disponible. Resélectionnez le fichier.');const dest=destinations.find(d=>d.id===job.city);if(!dest)throw Error('La destination n’est plus disponible.');if(job.row.media_type==='photo')await envoyerPhotos([job.file],{id:job.row.stay_id},dest);else await envoyerAudio(job.file,{id:job.row.stay_id},dest);S.invalidate();if(dest.experienceType==='home'&&homeActif?.id===dest.id)await chargerPhotosHome(homeActif);else if(String(souvenirsActifs?.id)===String(job.row.stay_id)){await chargerPhotos(souvenirsActifs);await chargerAudio(souvenirsActifs);}};
 })();

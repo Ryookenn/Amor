@@ -3,30 +3,33 @@
 // =========================
 
 const CACHE_NAME =
-    "amor-static-discovery-v8";
+    "amor-static-comfort-v9";
 
 
 const FICHIERS_ESSENTIELS = [
     "./",
     "./index.html",
     "./style.css?v=ux-mobile-2",
-    "./app.js?v=8",
+    "./app.js?v=9",
     "./experience.css?v=4",
-    "./experience.js?v=8",
+    "./experience.js?v=9",
     "./moments.css?v=4",
-    "./moments.js?v=8",
-    "./foundation.js?v=5",
-    "./photos.js?v=8",
-    "./together.js?v=8",
+    "./moments.js?v=9",
+    "./foundation.js?v=9",
+    "./photos.js?v=9",
+    "./together.js?v=9",
     "./together.css?v=5",
-    "./interface.js?v=8",
-    "./responses.js?v=8",
-    "./zoom.js?v=8",
-    "./ergonomics.js?v=8",
-    "./viewer.js?v=8",
-    "./catalogue.js?v=8",
-    "./transfers.js?v=8",
-    "./wishes.js?v=8",
+    "./interface.js?v=9",
+    "./responses.js?v=9",
+    "./zoom.js?v=9",
+    "./ergonomics.js?v=9",
+    "./viewer.js?v=9",
+    "./catalogue.js?v=9",
+    "./transfers.js?v=9",
+    "./wishes.js?v=9",
+    "./music.js?v=9",
+    "./comfort.js?v=9",
+    "./comfort.css?v=9",
     "./refinement.css?v=6",
     "./ergonomics.css?v=7",
     "./discovery.css?v=8",

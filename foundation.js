@@ -5,12 +5,13 @@ function amorConflict(error){
   document.dispatchEvent(new CustomEvent('amor:conflict'));return true;
  }return false;
 }
-function amorTrashQuery(table){
+function amorTrashQuery(table,options={}){
  let ids=[],task=null;
  const query={eq(column,id){if(column!=='id')throw Error('Filtre de corbeille non pris en charge');ids=[String(id)];return query;},
   in(column,list){if(column!=='id')throw Error('Filtre de corbeille non pris en charge');ids=list.map(String);return query;},
   then(resolve,reject){task??=supabaseClient.rpc('amor_trash',{p_table:table,p_ids:ids}).then(result=>{
-   if(!result.error)document.dispatchEvent(new CustomEvent('amor:trashed'));return result;
+   if(!result.error&&table==='first_times'&&result.data?.count===0)return {data:result.data,error:{message:'Cette première fois a changé ou est déjà attribuée. Actualisez la liste avant de réessayer.'}};
+   if(!result.error){document.dispatchEvent(new CustomEvent('amor:trashed'));if(options.undo&&result.data?.ids?.length)document.dispatchEvent(new CustomEvent('amor:undo-trash',{detail:{table,...result.data}}));}return result;
   });return task.then(resolve,reject);}};
  return query;
 }
